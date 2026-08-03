@@ -47,11 +47,11 @@ h1,h2,h3{font-family:var(--disp);text-transform:uppercase;letter-spacing:.04em;m
   box-shadow:none;border:2px dashed var(--faint);
 }
 .plate.rest.cur{border-style:solid;border-color:var(--text)}
-.plates{display:flex;gap:9px;justify-content:space-between;margin:0 2px 18px}
+.plates{display:flex;gap:5px;justify-content:space-between;margin:0 2px 18px}
 .plate{
-  flex:1;aspect-ratio:1;max-width:64px;border-radius:50%;
+  flex:1;aspect-ratio:1;max-width:44px;min-width:0;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.05em;
+  font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.02em;
   color:var(--bg);cursor:pointer;position:relative;border:none;
   box-shadow:inset 0 0 0 4px rgba(0,0,0,.28), inset 0 0 0 11px rgba(255,255,255,.06);
   opacity:.34;transition:opacity .15s, transform .15s;
@@ -114,7 +114,7 @@ h1,h2,h3{font-family:var(--disp);text-transform:uppercase;letter-spacing:.04em;m
 .rev-line{display:flex;justify-content:space-between;gap:10px;padding:6px 0;font-size:14.5px}
 .rev-line .num{color:var(--dim)}
 .plate.cur{opacity:1;transform:scale(1.12);box-shadow:inset 0 0 0 4px rgba(0,0,0,.28), inset 0 0 0 11px rgba(255,255,255,.06), 0 0 0 2px var(--bg), 0 0 0 4px var(--text)}
-.plate small{position:absolute;bottom:-18px;left:0;right:0;text-align:center;color:var(--faint);font:10px var(--mono);letter-spacing:0}
+.plate small{position:absolute;bottom:-17px;left:0;right:0;text-align:center;color:var(--faint);font:9.5px var(--mono);letter-spacing:0}
 .plates-wrap{margin-bottom:30px}
 
 /* cards */
@@ -192,6 +192,62 @@ h1,h2,h3{font-family:var(--disp);text-transform:uppercase;letter-spacing:.04em;m
 .rl-chip button{background:var(--line);border:none;color:var(--text);width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:11px;line-height:1}
 .ss-badge{display:inline-block;font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--bg);background:var(--dim);border-radius:5px;padding:2px 6px;vertical-align:middle;margin-left:5px}
 .ss-card{border-left:3px solid var(--dim)}
+/* The second half of a pair gets the outline treatment so the two read as one unit
+   without the closing movement shouting as loudly as the opener. */
+.ss-badge.ss-b{background:transparent;color:var(--dim);box-shadow:inset 0 0 0 1px var(--line)}
+.ss-note{
+  font-size:12.5px;line-height:1.45;color:var(--dim);
+  margin:-2px 0 9px;padding-left:9px;border-left:2px solid var(--line);
+}
+.ss-note b{color:var(--text)}
+
+/* ================= SUPERSET ROUNDS =================
+   The pair as one card. The accent border is the whole card rather than a per-exercise
+   stripe, because the unit here IS the pair; the rounds inside are the repeated thing.
+   Colour is used once, on the header, so three rounds of amber don't shout. */
+.ss-group{border:1px solid rgba(232,182,44,.4);padding:12px}
+.ss-hdr{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.ss-hdr-t{
+  font-family:var(--disp);font-size:14px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--arms);
+}
+.ss-hdr-t::before{content:"⟷";margin-right:6px;font-family:var(--mono)}
+.ss-hdr-n{font-size:12px;color:var(--faint)}
+/* what the two movements are, stated once above the rounds */
+.ss-leg{padding:0 0 9px;margin-bottom:2px;border-bottom:1px solid var(--line)}
+.ss-leg:last-of-type{margin-bottom:10px}
+.ss-leg-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ss-leg-h b{font-size:15px;flex:1;min-width:0}
+.ss-leg .ex-last{margin:6px 0 0}
+.ss-leg .ex-note{margin:3px 0 0}
+
+.ss-round{
+  background:var(--card2);border:1px solid var(--line);border-radius:12px;
+  padding:9px 10px;margin-bottom:8px;
+}
+.ss-round:last-child{margin-bottom:0}
+/* a finished round recedes so the one you are on is the obvious target */
+.ss-round.done{opacity:.55}
+.ss-round-h{
+  display:flex;align-items:baseline;gap:6px;margin-bottom:7px;
+  font-family:var(--disp);font-size:13px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--text);
+}
+.ss-round-of{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--faint);font-weight:400}
+/* the movement name, directly above its own inputs */
+.ss-mv{font-size:13px;color:var(--dim);margin:0 0 4px 2px}
+.ss-mv-off{color:var(--faint);display:flex;align-items:baseline;gap:7px;padding:5px 0 3px}
+.ss-mv-none{
+  font:10.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;
+  color:var(--faint);border:1px dashed var(--line);border-radius:5px;padding:2px 6px;
+}
+.ss-round .set{margin-bottom:7px}
+.ss-round .set:last-of-type{margin-bottom:0}
+.ss-rest{
+  font:11px var(--mono);letter-spacing:.05em;color:var(--faint);
+  margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);
+}
+.ss-rest::before{content:"⏱ ";}
 .alt-badge{
   display:inline-block;font:11.5px var(--mono);color:var(--bg);background:var(--dim);
   border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle;
@@ -295,6 +351,53 @@ h1,h2,h3{font-family:var(--disp);text-transform:uppercase;letter-spacing:.04em;m
 .timein::-webkit-date-and-time-value{text-align:left;margin:0}
 .timein::-webkit-calendar-picker-indicator{margin-left:auto}
 .timein:focus{outline:none;border-color:var(--dim)}
+
+/* ================= WARM-UPS =================
+   Deliberately quieter than a working set: no input, no tick, no border-left accent.
+   It is a reference strip, and it should read as one so it never gets mistaken for
+   something you are supposed to log. */
+.warm{
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  margin:2px 0 10px;padding:8px 10px;
+  background:rgba(255,255,255,.035);border:1px dashed var(--line);border-radius:10px;
+}
+.warm-tag{
+  font-family:var(--disp);font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--faint);flex-shrink:0;
+}
+.warm-sets{display:flex;flex-wrap:wrap;gap:5px}
+.warm-set{
+  font-family:var(--mono);font-size:13px;color:var(--dim);
+  background:rgba(255,255,255,.05);border-radius:6px;padding:3px 7px;white-space:nowrap;
+}
+.warm-set i{font-style:normal;color:var(--faint)}
+.warm-note{flex-basis:100%;font-size:11.5px;color:var(--faint);line-height:1.35}
+
+/* The four-week rep-matching rule, on the exercise it governs. */
+.asym-hint{
+  font-size:12.5px;line-height:1.45;color:var(--text);
+  background:rgba(232,182,44,.09);border:1px solid rgba(232,182,44,.3);
+  border-radius:9px;padding:7px 10px;margin:-4px 0 10px;
+}
+.asym-hint b{font-family:var(--disp);font-size:12.5px;letter-spacing:.04em;color:var(--arms)}
+/* The sample the number rests on. Deliberately quiet: it matters that it is there, and
+   it should never compete with the instruction above it. */
+.asym-note{display:block;margin-top:3px;color:var(--faint);font-size:11.5px}
+
+/* ---- the four-week re-test card ---- */
+.asym-card{border:1px solid var(--line);border-left:4px solid var(--arms)}
+.asym-row{
+  background:var(--card2);border-radius:11px;padding:10px 12px;margin-top:9px;
+}
+.asym-row b{font-size:15px}
+.asym-gap{font-size:13.5px;color:var(--dim);margin-top:3px;line-height:1.45}
+.asym-sample{font-size:11.5px;color:var(--faint);margin-top:3px;line-height:1.4}
+.asym-verdict{
+  margin-top:6px;font:11px var(--mono);text-transform:uppercase;letter-spacing:.07em;
+  border-radius:6px;padding:3px 7px;display:inline-block;
+}
+.asym-verdict.ok{color:var(--ok);background:rgba(70,168,92,.14)}
+.asym-verdict.keep{color:var(--arms);background:rgba(232,182,44,.14)}
 
 .rpe-cell{display:flex;align-items:center;gap:5px;min-width:0}
 .rpe-cell select{flex:1;min-width:0}
@@ -2048,26 +2151,43 @@ function migrate(){
      can never reach into the new plan afterwards looking for day keys that no longer
      exist. (absV2 and rxV2 have been deleted outright; fixSpiderV1 still has real work
      to do on logged history, so it keeps running.)                                  */
-  if(!S.planV3){
-    /* Was there a REAL plan here before, or is this a brand-new profile? load() hands
-       a new profile defaultProgram() already, so "S.program exists" is true either way
-       and is not the test. `fresh` is set by load() only for a profile that had nothing
-       in storage; without this check a first run would announce that it had switched
-       you off a programme you never ran. */
+  /* Tested on the SHAPE of the stored plan, not on a "have I run yet" flag.
+
+     A flag was wrong, and broke real accounts. syncNow() does
+     `if(remote.program) S.program = remote.program`, so opening the app on a device
+     whose gist still held the pre-v3 plan restored the old 7-day programme straight
+     over the migrated one. S.planV3 was already true, so this never ran again to
+     repair it, and S.program.pushA stayed undefined for good. The visible symptoms
+     were the Program tab throwing on `S.program[wid].forEach` and every progression
+     suggestion reporting "that exercise is not in the current programme", because
+     findProgramEntry() searches those same six missing keys.
+
+     Checking the shape means any route that puts a non-v3 plan into S.program — an
+     old gist, a stale import, a hand-edited backup — self-heals on the next load. An
+     edited v3 plan still has all six day keys, so your own changes are never clobbered. */
+  const planIsV3 = !!(S.program && DAYS.every(d=>Array.isArray(S.program[d])));
+  if(!planIsV3){
+    // Was there a REAL plan here before, or is this a brand-new profile? load() hands a
+    // new profile defaultProgram() already, so "S.program exists" is not the test.
     const hadProgram = !S.fresh && !!(S.program && Object.keys(S.program).length);
     S.program = defaultProgram();
-    S.pointer = 0;
-    S.cycleDone = [];
-    S.cycleStart = Date.now();
-    S.restDays = [];
-    S.override = null;
+    /* Only reset the cycle bookkeeping on the FIRST switch. On a later repair pass the
+       plan is being restored under a cycle you are part-way through, and throwing that
+       away would lose progress you actually made. */
+    if(!S.planV3){
+      S.pointer = 0;
+      S.cycleDone = [];
+      S.cycleStart = Date.now();
+      S.restDays = [];
+      S.override = null;
+    }
     S.absV2 = true; S.rxV2 = true;          // retired, cannot run against the v3 plan
     S.planV3 = true;
     // anchors the 2-week ramp-in and the 4-week asymmetry rule, both of which expire
     S.planStart = Date.now();
     S.blockStart = Date.now();
     invalidateMultiDay();
-    if(hadProgram){
+    if(hadProgram && !S.planV3){
       logPlanChange("programme", null, "Six-day Push/Pull/Legs A-B", [
         "Replaced the 7-day body-part rotation with pushA / pullA / legsA / pushB / pullB / legsB",
         "Volume cut to 108 working sets a cycle, from about 130",
@@ -2110,6 +2230,8 @@ function migrate(){
   if(!Array.isArray(S.restLog)) S.restLog = [];
   if(!Array.isArray(S.deleted)) S.deleted = [];
   if(!S.stalls || typeof S.stalls !== "object") S.stalls = {};
+  // which single-limb movements have already had their gap close and retired the rule
+  if(!S.asymRetired || typeof S.asymRetired !== "object") S.asymRetired = {};
   /* One rest a cycle became two, and the field changed shape with it: `S.restDay` was
      a single {date} object, `S.restDays` is the list of dates spent this cycle. A rest
      already taken under the old shape carries across as the first of the two credits
@@ -4010,27 +4132,73 @@ function render(){
   refreshNavBounds();
 }
 
+/* =====================================================================
+   THE CYCLE STRIP
+
+   Laid out as the cycle is actually run: P1 B1 L1 rest P2 B2 L2 rest. The rests sit in
+   position rather than being parked at the end, because that is the shape of the week
+   in your head and a strip that hides them makes an eight-day cycle look like a
+   six-day one.
+
+   WEEKDAY LABELS DRIFT, AND THAT IS ARITHMETIC, NOT A BUG. Eight slots do not fit in a
+   seven-day week. Anchoring P1 to the Sunday you actually did it means the rest at
+   slot 8 lands on the following Sunday, so the next cycle opens on Monday and the
+   whole pattern advances one weekday each time round. The labels below are therefore
+   PROJECTIONS from the anchor, not fixed assignments: they tell you which day each
+   slot is heading for this time round, and they move next time.
+
+   The alternative is pinning to weekdays, which needs a 7-day cycle and only leaves
+   room for one rest. That trade was considered and rejected: the second rest is worth
+   more here than a fixed calendar, because sleep is the binding constraint.        */
+const CYCLE_LAYOUT = ["pushA","pullA","legsA","rest","pushB","pullB","legsB","rest"];
+const WEEKDAY_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+/* The date slot 0 of the current cycle is anchored to. Prefers the first training day
+   actually logged this cycle, so the strip lines up with what you did rather than with
+   when the app happened to roll over. */
+function cycleAnchorDate(){
+  const inCycle = S.sessions
+    .filter(x=>x.startedAt >= S.cycleStart && DAYS.indexOf(x.workoutId) > -1)
+    .sort((a,b)=>a.startedAt - b.startedAt);
+  if(inCycle.length) return new Date(inCycle[0].startedAt);
+  return new Date(S.cycleStart);
+}
+// Projected weekday for a slot, counting forward from the anchor.
+function slotWeekday(slotIndex){
+  const d = cycleAnchorDate();
+  d.setDate(d.getDate() + slotIndex);
+  return WEEKDAY_SHORT[d.getDay()];
+}
 function plateStrip(){
   const cur = S.pointer;
+  const taken = restDaysThisCycle();
   let html = '<div class="plates-wrap"><div class="plates">';
-  ROTATION.forEach((id,i)=>{
-    const m = dayMeta(id);
+  let restSeen = 0;
+  CYCLE_LAYOUT.forEach((key, slot)=>{
+    const wd = slotWeekday(slot);
+    if(key === "rest"){
+      const idx = restSeen++;
+      const date = taken[idx] || null;
+      const isToday = date === todayStr();
+      html += `<button class="plate rest${isToday?" cur":""}${date?" done":""}" data-rest="${idx}"
+        aria-label="Rest ${idx+1} of ${REST_CREDITS}, ${wd}${date?", used "+date:", available"}"
+        >R<small>${wd}</small>${date?'<span class="pcheck">&#10003;</span>':""}</button>`;
+      return;
+    }
+    const i = ROTATION.indexOf(key);
+    const m = dayMeta(key);
     const done = S.cycleDone.includes(i);
     const cls = "plate" + (i===cur?" cur":"") + (done?" done":"");
-    html += `<button class="${cls}" data-slot="${i}" style="background:${m.color}" aria-label="Slot ${i+1}: ${m.name}${done?" (done)":""}">${m.short}<small>${i+1}</small>${done?'<span class="pcheck">✓</span>':""}</button>`;
+    html += `<button class="${cls}" data-slot="${i}" style="background:${m.color}"
+      aria-label="${m.name}, ${wd}${done?", done":""}">${m.short}<small>${wd}</small>${
+      done?'<span class="pcheck">&#10003;</span>':""}</button>`;
   });
-  // One plate per rest credit, so the two you get are visible rather than implied.
-  const taken = restDaysThisCycle();
-  for(let r=0; r<REST_CREDITS; r++){
-    const date = taken[r] || null;
-    const isToday = date === todayStr();
-    html += `<button class="plate rest${isToday?" cur":""}${date?" done":""}" data-rest="${r}" aria-label="Rest credit ${r+1} of ${REST_CREDITS}${date?", used "+date:", available"}">R<small>${restPlateLabel(date)}</small>${date?'<span class="pcheck">&#10003;</span>':""}</button>`;
-  }
   html += "</div>";
-  const restLeft = restCreditsLeft();
+  const left = restCreditsLeft();
   html += `<div class="cycle-row"><span class="num">${S.cycleDone.length} of ${ROTATION.length} done &middot; ${
-    restLeft === REST_CREDITS ? REST_CREDITS+" rests available"
-    : restLeft ? restLeft+" rest left" : "both rests used"}</span><span>${S.lastReview?'<button id="lastReviewBtn">last review</button> ':''}<button id="cycleReset">reset cycle</button></span></div>`;
+    left === REST_CREDITS ? REST_CREDITS+" rests available"
+    : left ? left+" rest left" : "both rests used"}</span><span>${
+    S.lastReview?'<button id="lastReviewBtn">last review</button> ':''}<button id="cycleReset">reset cycle</button></span></div>`;
   return html + "</div>";
 }
 
@@ -4341,6 +4509,7 @@ function viewToday(){
   h += deloadBannerHTML();
   h += sleepWindowHTML(wid);
   h += driftHTML();
+  h += asymRetestHTML();
   h += ruleBannerHTML();
   // The one thing worth changing today, taken from the grade of your last session of
   // THIS day. Sits above the exercise list, while there is still time to act on it.
@@ -4356,12 +4525,15 @@ function viewToday(){
     const occ = occIndex(rp, rpi);
     const ll = lastBox(wid, e.name, isFinisher || sharedAcrossDays(e.name), occ);
     const ins = insight(e.name, occ);
-    h += `<div class="ex-head"><b>${esc(e.name)}${other?'<span class="alt-badge">⇄</span>':''}</b><span class="ex-target">${e.sets}×${esc(e.reps)}${e.rpe?' · <span class="rpe-help" title="Tap for what RPE means">'+esc(rpeTxt(e.rpe))+'</span>':""}</span></div>`;
+    h += `<div class="ex-head"><b>${esc(e.name)}${supersetBadge(supersetInfo(rp.map(x=>x.chosen), rpi))}${other?'<span class="alt-badge">⇄</span>':''}</b><span class="ex-target">${e.sets}×${esc(e.reps)}${e.rpe?' · <span class="rpe-help" title="Tap for what RPE means">'+esc(rpeTxt(e.rpe))+'</span>':""}</span></div>`;
+    h += supersetNoteHTML(supersetInfo(rp.map(x=>x.chosen), rpi));
+    if(warmupKindFor(rp.map(x=>x.chosen), rpi)) h += warmupHTML(e, warmupKindFor(rp.map(x=>x.chosen), rpi));
     if(ll) h += ll;
     if(needsCalibration(e)) h += calibrateHTML(e);
     h += inlineTipHTML(tips[nrm(e.name)], tipsSeen);
     if(ins) h += `<div class="ex-insight"><span class="ins-tag">${esc(ins.tag)}</span><span>${esc(ins.msg)}</span></div>`;
     if(altStyle(e)) h += altHintHTML(altStyle(e), startSideFor(wid), e.sets);
+    h += asymHintHTML(e);
     let subBits = [];
     if(!ll) subBits.push('no sessions logged yet');
     if(other) subBits.push('alternates with '+esc(other.name)+' next '+m.name.toLowerCase()+' day');
@@ -4416,14 +4588,23 @@ function viewActiveSession(){
 
   let finLab = false;
   const tips = focusTipsFor(a.workoutId), tipsSeen = new Set();
-  a.entries.forEach((en,ei)=>{
+  for(let ei = 0; ei < a.entries.length; ei++){
+    const en = a.entries[ei];
     if(en.fin && !finLab){ h += `<div class="fin-label">Finisher</div>`; finLab = true; }
+    /* A superset pair renders as ONE card of rounds, and consumes both entries, so the
+       partner is skipped rather than drawn again underneath. */
+    const ssi = supersetInfo(a.entries, ei);
+    if(ssi && ssi.role === "first" && a.entries[ei+1]){
+      h += supersetGroupHTML(a, ei, tips, tipsSeen);
+      ei++;
+      continue;
+    }
     const occ = occIndex(a.entries, ei);
     const anyDay = en.fin || sharedAcrossDays(en.name);
     const last = lastSetsFor(a.workoutId, en.name, anyDay, occ);
     const ll = lastBox(a.workoutId, en.name, anyDay, occ);
-    h += `<div class="card ex${en.superset?' ss-card':''}">
-      <div class="ex-head"><b>${esc(en.name)}${en.superset?' <span class="ss-badge">superset</span>':''}</b>
+    h += `<div class="card ex${supersetInfo(a.entries, ei)?' ss-card':''}">
+      <div class="ex-head"><b>${esc(en.name)}${supersetBadge(supersetInfo(a.entries, ei))}</b>
         <span style="display:flex;align-items:center;gap:8px">
           <span class="ex-target">${en.sets.length}×${esc(en.reps||"")}${en.rpe?' · <span class="rpe-help" title="Tap for what RPE means">'+esc(rpeTxt(en.rpe))+'</span>':""}</span>
           <span class="icon-btns ex-ctl">
@@ -4433,25 +4614,20 @@ function viewActiveSession(){
           </span>
         </span>
       </div>`;
+    h += supersetNoteHTML(supersetInfo(a.entries, ei));
+    if(en.warm) h += warmupHTML(en, en.warm);
     if(ll) h += ll;
     h += inlineTipHTML(tips[nrm(en.name)], tipsSeen);
     if(en.note) h += `<div class="ex-note">${esc(en.note)}</div>`;
     if(en.startSide) h += altHintHTML(en.altStyle||"side", en.startSide, en.sets.length);
+    h += asymHintHTML(en);
     h += `<div class="set-labels"><span>set</span><span>lbs</span><span>reps</span><span class="rpe-help" title="Tap for what RPE means">target / rpe ⓘ</span><span>✓</span></div>`;
-    en.sets.forEach((st,si)=>{
-      h += `<div class="set${st.pr?" is-pr":""}">
-        <span class="idx">${si+1}${sideChip(en, si)}</span>
-        <input inputmode="decimal" data-e="${ei}" data-s="${si}" data-f="weight" value="${st.weight??""}" placeholder="${last&&last[si]&&last[si].weight!=null&&last[si].weight!==""?last[si].weight:"lbs"}">
-        <input inputmode="numeric" data-e="${ei}" data-s="${si}" data-f="reps" value="${st.reps??""}" placeholder="${last&&last[si]&&last[si].reps?last[si].reps:"reps"}">
-        <span class="rpe-cell">${rpeTargetChipHTML(en, si)}<select data-e="${ei}" data-s="${si}" data-f="rpe">${rpeOptions(st.rpe)}</select></span>
-        <button class="chk ${st.done?"on":""}" data-e="${ei}" data-s="${si}" data-f="done">✓</button>
-      </div>${prBadgeRow(st, ei, si)}`;
-    });
+    en.sets.forEach((st,si)=>{ h += setRowHTML(en, ei, si, last); });
     h += `<div style="display:flex;gap:8px;margin-top:4px">
       <button class="btn ghost small" data-addset="${ei}">+ set</button>
       <button class="btn ghost small" data-rmset="${ei}">− set</button>
     </div></div>`;
-  });
+  }
 
   h += `<div class="card">
     <h3 style="font-size:17px">Session note</h3>
@@ -4466,6 +4642,26 @@ function viewActiveSession(){
 /* The banner above an alternating exercise. It spells out the full running order for
    the session rather than just the opening side, so there's nothing to work out.
    `nSets` may be a count or an array length, both are accepted. */
+/* The four-week rep-matching rule, printed on the exercise it applies to rather than
+   left in a settings screen. The logged gap that motivates it (right 15, left 6, right
+   14 on preacher curl on 7/23) is real and large enough that training both sides to
+   their own limit would widen it, not close it. */
+function asymHintHTML(e){
+  if(!asymActiveFor(e)) return "";
+  const st = sideStats(e.name);
+  if(!st.ok){
+    // no usable reading yet: state the rule, don't invent a number
+    return `<div class="asym-hint"><b>Match the weaker side.</b> Same rep count both sides,
+      set by whichever is weaker. <span class="asym-note">${esc(st.reason)}.</span></div>`;
+  }
+  if(!st.weaker){
+    return `<div class="asym-hint"><b>Sides are level</b> at about ${r1(st.R.reps)} reps.
+      <span class="asym-note">${esc(asymSampleText(st))}.</span></div>`;
+  }
+  const cap = Math.floor(Math.min(st.R.reps, st.L.reps));
+  return `<div class="asym-hint"><b>Cap both sides at ${cap} reps.</b>
+    ${esc(asymGapText(st))} <span class="asym-note">${esc(asymSampleText(st))}.</span></div>`;
+}
 function altHintHTML(style, startSide, nSets){
   const n = Math.max(1, Math.min(8, parseInt(nSets,10) || 3));
   const seq = [];
@@ -4567,9 +4763,16 @@ function viewFocusSession(){
   const m = dayMeta(a.workoutId);
   if(a.focusIdx==null) a.focusIdx = 0;
   a.focusIdx = Math.max(0, Math.min(a.focusIdx, Math.max(0, a.entries.length-1)));
+  /* A superset is one step, not two. Landing on the second half means you arrived from
+     the far side, so slide back to the first and show the whole pair. */
+  const _ssHere = supersetInfo(a.entries, a.focusIdx);
+  if(_ssHere && _ssHere.role === "second") a.focusIdx = Math.max(0, a.focusIdx - 1);
   const ei = a.focusIdx;
   const en = a.entries[ei];
-  const atEnd = ei >= a.entries.length-1;
+  const _pair = supersetInfo(a.entries, ei);
+  const _isPair = !!(_pair && _pair.role === "first" && a.entries[ei+1]);
+  // a pair occupies two entries, so "at the end" has to account for both
+  const atEnd = (_isPair ? ei + 1 : ei) >= a.entries.length - 1;
   let h = `<div class="card" style="padding:12px 16px">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div style="display:flex;align-items:center;gap:10px"><span class="dot" style="background:${m.color};width:15px;height:15px"></span><h3 style="font-size:19px">${m.name}</h3></div>
@@ -4581,6 +4784,12 @@ function viewFocusSession(){
     h += `<div class="empty">Nothing left in this session.</div>`;
     return h + focusFooter(a, true);
   }
+  if(_isPair){
+    // one card of rounds, exactly as the flat view draws it
+    h += supersetGroupHTML(a, ei, focusTipsFor(a.workoutId), new Set());
+    if(atEnd) h += focusNoteCardHTML(a);
+    return h + focusFooter(a, atEnd);
+  }
   const occ = occIndex(a.entries, ei);
   const anyDay = en.fin || sharedAcrossDays(en.name);
   const last = lastSetsFor(a.workoutId, en.name, anyDay, occ);
@@ -4590,20 +4799,14 @@ function viewFocusSession(){
       <span class="icon-btns ex-ctl"><button data-exskip="${ei}" aria-label="Skip today">✕</button></span>
     </div>
     <div class="ex-target" style="margin:2px 0 10px">${en.sets.length}×${esc(en.reps||"")}${en.rpe?' · <span class="rpe-help" title="Tap for what RPE means">'+esc(rpeTxt(en.rpe))+'</span>':""}</div>`;
+  h += supersetNoteHTML(supersetInfo(a.entries, ei));
+  if(en.warm) h += warmupHTML(en, en.warm);
   if(ll) h += ll;
   h += inlineTipHTML(focusTipsFor(a.workoutId)[nrm(en.name)]);
   if(en.note) h += `<div class="ex-note">${esc(en.note)}</div>`;
   if(en.startSide) h += altHintHTML(en.altStyle||"side", en.startSide, en.sets.length);
   h += `<div class="set-labels"><span>set</span><span>lbs</span><span>reps</span><span class="rpe-help" title="Tap for what RPE means">target / rpe ⓘ</span><span>✓</span></div>`;
-  en.sets.forEach((st,si)=>{
-    h += `<div class="set${st.pr?" is-pr":""}">
-      <span class="idx">${si+1}${sideChip(en, si)}</span>
-      <input inputmode="decimal" data-e="${ei}" data-s="${si}" data-f="weight" value="${st.weight??""}" placeholder="${last&&last[si]&&last[si].weight!=null&&last[si].weight!==""?last[si].weight:"lbs"}">
-      <input inputmode="numeric" data-e="${ei}" data-s="${si}" data-f="reps" value="${st.reps??""}" placeholder="${last&&last[si]&&last[si].reps?last[si].reps:"reps"}">
-      <span class="rpe-cell">${rpeTargetChipHTML(en, si)}<select data-e="${ei}" data-s="${si}" data-f="rpe">${rpeOptions(st.rpe)}</select></span>
-      <button class="chk ${st.done?"on":""}" data-e="${ei}" data-s="${si}" data-f="done">✓</button>
-    </div>${prBadgeRow(st, ei, si)}`;
-  });
+  en.sets.forEach((st,si)=>{ h += setRowHTML(en, ei, si, last); });
   h += `<div style="display:flex;gap:8px;margin-top:4px">
     <button class="btn ghost small" data-addset="${ei}">+ set</button>
     <button class="btn ghost small" data-rmset="${ei}">− set</button>
@@ -4617,6 +4820,14 @@ function viewFocusSession(){
     </div>`;
   }
   return h + focusFooter(a, atEnd);
+}
+function focusNoteCardHTML(a){
+  return `<div class="card">
+      <h3 style="font-size:17px">Session note</h3>
+      <div class="field" style="margin:8px 0 0"><input id="sessNote" placeholder="optional, how did it go?" value="${esc(a.note||"")}"></div>
+      <div class="sub" style="margin-top:12px">How did it feel?</div>
+      <div class="feel-row">${FEELS.map((f,i)=>`<button class="feel-btn ${a.feel===i+1?"on":""}" data-feel="${i+1}">${f}</button>`).join("")}</div>
+    </div>`;
 }
 function focusFooter(a, atEnd){
   return `<div class="btn-row" style="margin-top:0">
@@ -5544,7 +5755,7 @@ function viewHistory(){
 /* ---------- PROGRAM ---------- */
 function viewProgram(){
   let h = `<div class="hdr"><h1>Program</h1>${hdrRight()}</div>
-  <div class="sub" style="margin:-8px 2px 14px">Your rotation: ${ROTATION.map(w=>META[w].name).join(" → ")}. Exercises marked ⇄ alternate automatically every other session of that day. Targets show <span class="rpe-help">RPE</span>, tap to see what it means.</div>
+  <div class="sub" style="margin:-8px 2px 14px">Your rotation: ${ROTATION.map(w=>dayName(w)).join(" → ")}. Exercises marked ⇄ alternate automatically every other session of that day. Targets show <span class="rpe-help">RPE</span>, tap to see what it means.</div>
   <div class="btn-row" style="margin-bottom:16px">
     <button class="btn ghost small" id="planBtn">📄 View / download full plan</button>
   </div>
@@ -5555,10 +5766,14 @@ function viewProgram(){
       <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px">
         <span class="dot" style="background:${m.color}"></span><h3>${m.name}</h3>
       </div>`;
-    S.program[wid].forEach((e,i)=>{
+    // `|| []` rather than a bare index: a day key can legitimately be missing for a
+    // moment after a sync restores an older plan, and a thrown Program tab is a much
+    // worse failure than an empty card.
+    (S.program[wid] || []).forEach((e,i)=>{
       const nextUp = e.alt ? (activeVariant(wid,e)===e ? e.name : e.alt.name) : null;
       const asty = altStyle(e);
       let title = esc(e.name)
+        + supersetBadge(supersetInfo(S.program[wid] || [], i))
         + (asty === "side"  ? ' <span class="uni-badge">L / R</span>' : '')
         + (asty === "cross" ? ' <span class="uni-badge">crossover</span>' : '')
         + (e.alt ? ' <span class="alt-badge">⇄ '+esc(e.alt.name)+'</span>' : '');
@@ -5644,7 +5859,10 @@ function viewSync(){
         placeholder="e.g. 8 &mdash; leave blank to turn this off"></div>
 
     <div class="field" style="margin-bottom:6px"><label>Wake time, only if you have a fixed one</label>
-      <input type="time" class="timein" id="wakeIn" value="${esc(S.wakeTime||"")}"></div>
+      <div style="display:flex;gap:8px;align-items:stretch">
+        <input type="time" class="timein" id="wakeIn" value="${esc(S.wakeTime||"")}" style="flex:1">
+        ${S.wakeTime ? `<button class="btn ghost small" id="wakeClear" style="flex-shrink:0;width:auto;padding:0 14px">Clear</button>` : ""}
+      </div></div>
     <div class="sub" style="margin:0 0 10px;font-size:12.5px;color:var(--faint)">
       ${hasWakeTime()
         ? `Set to <b>${esc(S.wakeTime)}</b>. The app works backwards from it: wake &minus; ${r1(sleepNeedH())} h is
@@ -5859,6 +6077,15 @@ function bind(){
     if(s) openScoreCard(s, null);
   });
 
+  const art = $("#asymRetestBtn");
+  if(art) art.onclick = ()=>{
+    const res = applyAsymRetest();
+    render();
+    toast(res.retired.length
+      ? "Rule retired on "+res.retired.length+" movement"+(res.retired.length===1?"":"s")
+      : "Gaps still open, rule stays on");
+  };
+
   const dlStart = $("#startDeloadBtn");
   if(dlStart) dlStart.onclick = ()=>{ startDeload(); render(); toast("Deload week started"); };
   const dlEnd = $("#endDeloadBtn");
@@ -5942,8 +6169,15 @@ function bind(){
         // PR spark, compared against your ALL-TIME best for this exercise, and now
         // recorded on the set so it also shows as a badge and in the session summary.
         checkPR(ei, si, el);
-        // the ✓ is the stopwatch trigger, but never inside a superset (no rest between/after)
-        if(!entry.superset) startRest(ei, si);
+        /* The ✓ starts the stopwatch, except in two cases: inside a superset, where
+           there is deliberately no rest, and on the very last set of the very last
+           exercise, where there is nothing left to rest FOR. Timing the walk to the
+           car was never useful and it polluted the rest-discipline grade. */
+        const lastEntry = ei === S.active.entries.length - 1;
+        const lastSet = si === entry.sets.length - 1;
+        // endsRound() is the superset-aware version of "is there anything left to rest
+        // for": inside a pair only the movement that closes the round starts the clock.
+        if(endsRound(S.active.entries, ei, si) && !(lastEntry && lastSet)) startRest(ei, si);
       } else {
         // unchecking: cancel its running timer and clear its recorded rest
         const rt = S.active.restTimer;
@@ -6017,7 +6251,20 @@ function bind(){
   });
   const goFocus = dir=>{
     harvestActive();
-    S.active.focusIdx = Math.max(0, Math.min((S.active.focusIdx||0)+dir, S.active.entries.length-1));
+    const list = S.active.entries;
+    let i = S.active.focusIdx || 0;
+    /* Step by WHOLE exercises: a superset pair is one stop, so moving forward off the
+       first half must clear the second, and moving back onto a pair must land on its
+       first half rather than dropping you into the middle of it. */
+    if(dir > 0){
+      const here = supersetInfo(list, i);
+      i += (here && here.role === "first" && list[i+1]) ? 2 : 1;
+    } else {
+      i -= 1;
+      const landed = supersetInfo(list, i);
+      if(landed && landed.role === "second") i -= 1;
+    }
+    S.active.focusIdx = Math.max(0, Math.min(i, list.length-1));
     save(); render(); window.scrollTo(0,0);
   };
   document.querySelectorAll("[data-fprev]").forEach(b=> b.onclick=()=> goFocus(-1));
@@ -6214,6 +6461,16 @@ function bind(){
     save(); queueSync(); render();
     toast(S.wakeTime ? "Sleep window guard on" : "Wake time cleared, showing projection only");
   };
+  /* An explicit Clear button, because a native time picker on iOS has no way to empty
+     itself: the wheels always land on SOME time, so `onchange` never fires with a blank
+     value and the field cannot be cleared by hand. Without this there was no route back
+     to the hours-only mode once a wake time had been set. */
+  const wc = $("#wakeClear");
+  if(wc) wc.onclick = ()=>{
+    S.wakeTime = null;
+    save(); queueSync(); render();
+    toast("Wake time cleared, using your sleep target only");
+  };
   const dls2 = $("#startDeloadBtn2");
   if(dls2) dls2.onclick = ()=>{ startDeload(); render(); toast("Deload week started"); };
   const dle2 = $("#endDeloadBtn2");
@@ -6235,11 +6492,16 @@ function startWorkout(wid){
     workoutId: wid,
     date: todayStr(),
     startedAt: Date.now(),
-    entries: resolvedProgram(wid).map(({chosen:e, isFinisher})=>({
+    entries: resolvedProgram(wid).map(({chosen:e, isFinisher}, _wi)=>({
       name: e.name, reps: e.reps, rpe: e.rpe, note: e.note, fin: isFinisher||undefined,
       // the per-set ramp, frozen at session start so editing the plan mid-workout
       // can't retarget sets you have already done
       rpes: Array.isArray(e.rpes) ? e.rpes.slice() : undefined,
+      // which warm-up ramp this slot earns, decided by position in the session
+      warm: warmupKindFor(resolvedProgram(wid).map(x=>x.chosen), _wi) || undefined,
+      // the prescribed load, carried so the warm-up ramp has something to take a
+      // percentage of. Distinct from the per-set weights on entry.sets.
+      planWeight: (e.weight == null ? undefined : e.weight),
       rest: Array.isArray(e.rest) ? e.rest.slice() : undefined,
       superset: e.superset||undefined, supersetEnd: e.supersetEnd||undefined,
       // which alternating scheme this movement uses, and which side it opens on 
@@ -8014,9 +8276,18 @@ function ruleBannerHTML(){
   }
   if(asymActive()){
     const left = Math.max(0, ASYM_WEEKS - weeksSince(planStartAt()));
+    const measured = unilateralInPlan()
+      .map(e=>({name:e.name, st:sideStats(e.name)}))
+      .filter(x=>x.st.ok && x.st.weaker)
+      .sort((a,b)=>b.st.gap - a.st.gap)
+      .slice(0,2);
     bits.push({k:"Asymmetry", v:"Match the weaker side on all single-limb work for another " +
-      (left < 1 ? Math.round(left * 7) + " days" : r1(left) + " weeks") +
-      ", then re-test. Logged gap was right 15 / left 6 on preacher curl."});
+      (left < 1 ? Math.round(left * 7) + " days" : r1(left) + " weeks") + ", then re-test." +
+      (measured.length
+        ? " Widest gap right now: " + measured.map(x=>
+            x.name + " " + r1(x.st.gap) + " rep" + (r1(x.st.gap)===1?"":"s") +
+            (x.st.confident ? "" : " (provisional)")).join(", ") + "."
+        : " No balanced reading yet, so no gap to report.")});
   }
   if(!bits.length) return "";
   return `<div class="card rule-card">` + bits.map(b=>
@@ -8117,6 +8388,440 @@ function sleepWindowHTML(wid){
       sleep is the constraint everything else is competing with.</div>`
       : `<div class="fc-sub">Even trimmed this will not fit. Train tomorrow rather than borrowing the hours from sleep.</div>`}
   </div>`;
+}
+
+/* =====================================================================
+   WARM-UPS
+
+   Two to three ramping sets before the FIRST exercise of a session, working up to
+   roughly 90% of the working load for 2-3 reps. One light set before the SECOND
+   compound. Nothing at all before isolation work.
+
+   They are guidance, not data: none of them are logged, none of them count toward set
+   totals, and none reach volume, PR detection, the muscle map or the quality score.
+   That is deliberate rather than lazy. A warm-up set is defined by being easy, so
+   counting it as a working set would inflate every volume figure in the app, and
+   asking you to tick three extra rows before your first real set is exactly the
+   friction that stops people warming up at all.
+
+   A ramp is expressed in percentages so it stays correct when the load moves. The last
+   rung sits at 90% for 2-3 reps: close enough to feel the working weight, far enough
+   from it to cost nothing.                                                          */
+const WARM_FULL = [{pct:0.40, reps:"8"}, {pct:0.65, reps:"5"}, {pct:0.90, reps:"3"}];
+const WARM_LIGHT = [{pct:0.55, reps:"5"}];
+
+// Round to something you can actually load: dumbbells move in 2.5s, plates in 5s.
+function warmRound(w, name){
+  const step = /dumbbell|\bdb\b/.test(nrm(name)) ? 2.5 : 5;
+  return Math.max(step, Math.round(w / step) * step);
+}
+/* Which ramp, if any, this exercise gets. Position in the session decides it: the
+   opener gets the full ramp because it is the one going in cold, the second compound
+   gets a single light set, and isolation gets nothing because the compounds in front
+   of it have already warmed the joint. */
+function warmupKindFor(list, index){
+  if(index === 0) return "full";
+  const compounds = [];
+  list.forEach((x, i)=>{ if(isCompound(x.name || (x.chosen && x.chosen.name))) compounds.push(i); });
+  if(compounds.length > 1 && compounds[1] === index) return "light";
+  return null;
+}
+function warmupPlan(e, kind){
+  if(!kind) return [];
+  const spec = kind === "full" ? WARM_FULL : WARM_LIGHT;
+  // programme entries carry `weight`; live session entries carry `planWeight`
+  const w = parseFloat(e && (e.weight != null ? e.weight : e.planWeight));
+  if(!(w > 0)){
+    // bodyweight: there is no percentage to take, so ramp on reps instead
+    return kind === "full"
+      ? [{label:"bodyweight", reps:"8"}, {label:"bodyweight", reps:"5"}]
+      : [{label:"bodyweight", reps:"5"}];
+  }
+  return spec.map(x=>({label: warmRound(w * x.pct, e.name) + " lb", reps: x.reps, pct: Math.round(x.pct*100)}));
+}
+function warmupHTML(e, kind){
+  const plan = warmupPlan(e, kind);
+  if(!plan.length) return "";
+  return `<div class="warm">
+    <span class="warm-tag">Warm-up</span>
+    <span class="warm-sets">${plan.map(x=>
+      `<span class="warm-set">${esc(x.label)} <i>&times;${esc(x.reps)}</i></span>`).join("")}</span>
+    <span class="warm-note">${
+      plan[0] && plan[0].pct == null
+        ? (kind === "full" ? "easy reps to warm the joint, no added load. Not counted."
+                           : "one easy set. Not counted.")
+        : (kind === "full" ? "ramping to about 90% of your working load. Not counted."
+                           : "one light set. Not counted.")}</span>
+  </div>`;
+}
+
+/* =====================================================================
+   LEFT / RIGHT ASYMMETRY, measured rather than asserted
+
+   Every set of a one-limb-at-a-time movement is already attributable to a side: the
+   entry stores `startSide` and sideForSet() alternates from there, so set 1 is the
+   opening side, set 2 the other, set 3 the opener again. Nothing was reading it.
+
+   THE PARITY PROBLEM, which is the whole reason this is more than an average.
+
+   With 3 sets at RPE 7,8,9 the opening side gets positions 1 and 3 and the other side
+   gets position 2. Those positions are not equivalent: position 1 is the freshest set
+   of the exercise and position 3 the most fatigued. startSideFor() flips the opener
+   every session, so across a PAIR of sessions each side has had positions 1, 2 and 3
+   exactly once and the fatigue mix is identical. Across an ODD number of sessions it
+   is not: one side is still carrying an extra fresh set, or an extra fatigued one,
+   that has not been offset yet.
+
+   On a gap of a few tenths of a rep that would not matter. On the 15-vs-6 preacher
+   curl gap this rule exists to close, being wrong by "one extra fresh set" is enough
+   to make a closing gap look open or an open one look closed, and the four-week
+   re-test decides whether to keep training both sides to the weaker one. So the
+   comparison runs on a BALANCED WINDOW: the largest run of recent sessions in which
+   the number that opened right equals the number that opened left.
+
+   Balanced, not merely even, because the flip derives from a session count that a
+   deleted or resumed session can repeat, so R,L,R,L is the intent and not a guarantee.
+   ===================================================================== */
+let ASYM_CACHE = {key:null, data:{}};
+function asymCacheKey(){
+  const last = S.sessions[S.sessions.length-1] || {};
+  return S.sessions.length + ":" + (last.id||"") + ":" + (last.edited||0);
+}
+// Every logged appearance of a one-limb movement, newest first, with its opening side.
+function sideHistory(exName){
+  const k = nrm(exName);
+  const out = [];
+  for(let i=S.sessions.length-1; i>=0; i--){
+    const s = S.sessions[i];
+    (s.entries||[]).forEach(en=>{
+      if(nrm(en.name) !== k) return;
+      if(!en.startSide) return;                 // logged before sides were tracked
+      const sets = (en.sets||[]).filter(isWorkingSet);
+      if(!sets.length) return;
+      out.push({date:s.date, at:s.startedAt, startSide:en.startSide, entry:en, sets});
+    });
+  }
+  return out;
+}
+/* The largest RECENT run whose opening sides balance. Walks newest-first and remembers
+   the last point at which the two counts were equal; everything older than that is
+   dropped, because including it would reintroduce exactly the bias this removes. */
+function balancedWindow(hist){
+  let r = 0, l = 0, cut = 0;
+  for(let i=0; i<hist.length; i++){
+    if(hist[i].startSide === "R") r++; else l++;
+    if(r === l) cut = i + 1;                    // balanced as of here
+  }
+  return {window: hist.slice(0, cut), dropped: hist.length - cut, openedR: cut/2, openedL: cut/2};
+}
+function sideStats(exName){
+  const key = asymCacheKey();
+  if(ASYM_CACHE.key !== key){ ASYM_CACHE = {key, data:{}}; }
+  const ck = nrm(exName);
+  if(ck in ASYM_CACHE.data) return ASYM_CACHE.data[ck];
+
+  const hist = sideHistory(exName);
+  const bal = balancedWindow(hist);
+  const acc = {R:{reps:[], loads:[]}, L:{reps:[], loads:[]}};
+  bal.window.forEach(h=>{
+    h.entry.sets.forEach((st, i)=>{
+      if(!isWorkingSet(st)) return;
+      const side = sideForSet(h.startSide, i);
+      if(!side || !acc[side]) return;
+      const reps = parseFloat(st.reps)||0;
+      const w = parseFloat(st.weight)||0;
+      if(reps > 0) acc[side].reps.push(reps);
+      if(w > 0) acc[side].loads.push(w);
+    });
+  });
+  const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
+  const R = {reps: avg(acc.R.reps), load: avg(acc.R.loads), sets: acc.R.reps.length};
+  const L = {reps: avg(acc.L.reps), load: avg(acc.L.loads), sets: acc.L.reps.length};
+
+  let out;
+  if(!bal.window.length || R.reps == null || L.reps == null){
+    out = {
+      ok:false, sessions: hist.length, balanced: bal.window.length,
+      reason: hist.length
+        ? (bal.window.length
+            ? "not enough logged sets on both sides yet"
+            : "only "+hist.length+" session"+(hist.length===1?"":"s")+" logged, and the opening side has not flipped yet")
+        : "no sides logged for this movement yet"
+    };
+  } else {
+    const gap = R.reps - L.reps;                 // positive means the right is ahead
+    out = {
+      ok:true,
+      sessions: hist.length,
+      balanced: bal.window.length,               // sessions actually compared
+      dropped: bal.dropped,                      // trimmed to keep the window balanced
+      R, L,
+      gap: Math.abs(gap),
+      weaker: Math.abs(gap) < 0.05 ? null : (gap > 0 ? "L" : "R"),
+      stronger: Math.abs(gap) < 0.05 ? null : (gap > 0 ? "R" : "L"),
+      // two sessions is the minimum that can cancel the positional bias at all
+      confident: bal.window.length >= 2
+    };
+  }
+  ASYM_CACHE.data[ck] = out;
+  return out;
+}
+function sideWordFull(s){ return s === "L" ? "left" : "right"; }
+// The gap in words, with the sample it rests on, so the number is never bare.
+function asymGapText(st){
+  if(!st.ok) return st.reason;
+  if(!st.weaker) return "Both sides level at about "+r1(st.R.reps)+" reps.";
+  const w = st.weaker === "L" ? st.L : st.R;
+  const s = st.weaker === "L" ? st.R : st.L;
+  return "Your "+sideWordFull(st.weaker)+" is "+r1(st.gap)+" rep"+(r1(st.gap)===1?"":"s")+
+    " behind: "+sideWordFull(st.stronger)+" "+r1(s.reps)+", "+sideWordFull(st.weaker)+" "+r1(w.reps)+".";
+}
+function asymSampleText(st){
+  if(!st.ok) return "";
+  const n = st.balanced;
+  return n + " balanced session" + (n===1?"":"s") +
+    (st.dropped ? ", oldest " + st.dropped + " dropped to keep the opening sides even" : "") +
+    (st.confident ? "" : " — too few to cancel the fresh-set bias, treat as provisional");
+}
+// A movement retires from the rule individually once its own gap has closed.
+function asymRetiredFor(exName){
+  return !!(S.asymRetired && S.asymRetired[nrm(exName)]);
+}
+function asymActiveFor(e){
+  if(altStyle(e) !== "side") return false;
+  if(asymRetiredFor(e.name)) return false;
+  /* Once the re-test has run, the four-week clock stops being the authority. Anything
+     it did not retire is a movement whose gap it measured and found still open, so the
+     rule continues on that movement until the gap actually closes. Falling back to the
+     clock here was a bug: it switched the rule off for Preacher Curl at week four with
+     a measured nine-rep gap, which is precisely the case it exists for. */
+  if(S.asymRetest && S.asymRetest.at) return true;
+  if(asymActive()) return true;                      // still inside the initial window
+  /* Window over but the re-test not yet acknowledged. The rule holds until you have
+     actually seen the numbers, otherwise it lapses silently on the day the clock runs
+     out and you would go back to training both sides to their own limit without ever
+     being told whether the gap had closed. */
+  return asymRetestDue();
+}
+const ASYM_CLOSED_GAP = 2;      // "within 2 reps" retires the rule, per the plan
+function unilateralInPlan(){
+  const out = [], seen = new Set();
+  DAYS.forEach(d=>(S.program[d]||[]).forEach(e=>{
+    if(altStyle(e) !== "side") return;
+    const k = nrm(e.name);
+    if(seen.has(k)) return;
+    seen.add(k); out.push(e);
+  }));
+  return out;
+}
+/* The four-week re-test. Due once the rule's window is up; reports each movement's
+   measured gap and retires the rule on the ones now inside 2 reps. */
+function asymRetestDue(){
+  if(asymActive()) return false;                       // still inside the four weeks
+  if(S.asymRetest && S.asymRetest.at){
+    /* Already run once. It comes back only when there is something good to report:
+       a movement it kept the rule on has since closed to within the threshold on a
+       balanced reading. That makes it self-maintaining without nagging, because it
+       cannot reappear while nothing has changed. */
+    return unilateralInPlan().some(e=>{
+      if(asymRetiredFor(e.name)) return false;
+      const st = sideStats(e.name);
+      return st.ok && st.confident && st.gap <= ASYM_CLOSED_GAP;
+    });
+  }
+  return unilateralInPlan().some(e=>sideStats(e.name).ok);
+}
+function asymRetestHTML(){
+  if(!asymRetestDue()) return "";
+  const rows = unilateralInPlan().map(e=>({e, st: sideStats(e.name)}));
+  return `<div class="card asym-card">
+    <div class="fc-k" style="color:var(--arms)">Four-week asymmetry re-test</div>
+    <div class="fc-do">The rep-matching rule has run its four weeks. Here is where each side actually sits.</div>
+    ${rows.map(({e, st})=>`<div class="asym-row">
+      <b>${esc(e.name)}</b>
+      <div class="asym-gap">${esc(asymGapText(st))}</div>
+      ${st.ok ? `<div class="asym-sample">${esc(asymSampleText(st))}</div>` : ""}
+      ${st.ok ? `<div class="asym-verdict ${st.gap <= ASYM_CLOSED_GAP ? "ok" : "keep"}">${
+        st.gap <= ASYM_CLOSED_GAP
+          ? "Inside "+ASYM_CLOSED_GAP+" reps &mdash; rule retires for this movement"
+          : "Still outside "+ASYM_CLOSED_GAP+" reps &mdash; keep matching the weaker side"
+      }</div>` : ""}
+    </div>`).join("")}
+    <button class="fc-btn" id="asymRetestBtn">Apply and close the re-test</button>
+  </div>`;
+}
+function applyAsymRetest(){
+  if(!S.asymRetired || typeof S.asymRetired !== "object") S.asymRetired = {};
+  const kept = [], retired = [];
+  unilateralInPlan().forEach(e=>{
+    const st = sideStats(e.name);
+    if(!st.ok) return;
+    // never retire on a provisional reading: an unbalanced window is exactly the case
+    // where a gap can look closed when it is not
+    if(st.confident && st.gap <= ASYM_CLOSED_GAP){
+      S.asymRetired[nrm(e.name)] = true;
+      retired.push(e.name);
+    } else kept.push(e.name);
+  });
+  S.asymRetest = {at: Date.now(), retired, kept};
+  logPlanChange("rule", null, "Asymmetry rule re-test", [
+    retired.length ? "Retired on: "+retired.join(", ") : "Nothing retired yet",
+    kept.length ? "Still matching the weaker side on: "+kept.join(", ") : "All movements are level"
+  ], {note:"Gaps measured on balanced windows only, so positional bias from the opening-side flip is cancelled."});
+  save(); queueSync();
+  return {retired, kept};
+}
+
+/* =====================================================================
+   SUPERSET PAIRS, labelled on both halves
+
+   Only the FIRST movement of a pair carries the `superset` flag, and that is correct:
+   the flag suppresses the rest timer, drops the movement from rest-discipline grading
+   and removes its rest from the session-length estimate, and all three of those are
+   true of the first movement only, because the rest genuinely happens after the second.
+
+   But a bare "superset" badge on one exercise, with no mention of the other, is close
+   to useless standing in the gym: it tells you a rule applies without telling you what
+   it applies to. Both halves are therefore labelled, with the pairing named and the
+   rest behaviour spelled out, while the functional flag stays exactly where it was.  */
+function supersetInfo(list, i){
+  const cur = list && list[i];
+  if(!cur) return null;
+  if(cur.superset){
+    const next = list[i+1];
+    return {role:"first", partner: next ? next.name : null};
+  }
+  const prev = list[i-1];
+  if(prev && prev.superset) return {role:"second", partner: prev.name};
+  return null;
+}
+function supersetBadge(info){
+  if(!info) return "";
+  return ` <span class="ss-badge${info.role==="second"?" ss-b":""}">superset ${
+    info.role==="first" ? "1/2" : "2/2"}</span>`;
+}
+function supersetNoteHTML(info){
+  if(!info || !info.partner) return "";
+  return `<div class="ss-note">${info.role === "first"
+    ? `Straight into <b>${esc(info.partner)}</b> with no rest, then rest.`
+    : `Comes straight after <b>${esc(info.partner)}</b>. Rest after this one.`}</div>`;
+}
+
+/* =====================================================================
+   SUPERSET ROUNDS
+
+   A superset is performed round by round: one set of A, one set of B, rest, repeat.
+   Rendering it as two separate exercise cards described the pairing accurately and
+   showed you the wrong shape — you read three sets of lateral raise stacked together
+   and did them that way.
+
+   So a pair renders as ONE card of rounds. The inputs inside are byte-identical to the
+   ones the flat view emits, same data-e / data-s identity, so every handler already
+   bound to them (the change handler, the tick, PR badges, markPriorDone) keeps working
+   untouched. Only the layout moved.
+
+   UNEVEN PAIRS ARE NORMAL and are not an error to hide: Legs A runs 3 calf raises
+   against 2 ab crunches, Legs B runs 2 reverse hypers against 4 seated calf raises.
+   A round where one movement has run out shows the movement greyed with "no set this
+   round" rather than silently vanishing, because a missing row reads as a bug.
+   ===================================================================== */
+
+/* One set row. Extracted so the flat view and the round view cannot drift apart:
+   there is exactly one definition of what a loggable set looks like. */
+function setRowHTML(en, ei, si, last, idxLabel){
+  const st = en.sets[si];
+  if(!st) return "";
+  const idx = (idxLabel != null) ? idxLabel : (si + 1);
+  return `<div class="set${st.pr?" is-pr":""}">
+    <span class="idx">${idx}${sideChip(en, si)}</span>
+    <input inputmode="decimal" data-e="${ei}" data-s="${si}" data-f="weight" value="${st.weight??""}" placeholder="${last&&last[si]&&last[si].weight!=null&&last[si].weight!==""?last[si].weight:"lbs"}">
+    <input inputmode="numeric" data-e="${ei}" data-s="${si}" data-f="reps" value="${st.reps??""}" placeholder="${last&&last[si]&&last[si].reps?last[si].reps:"reps"}">
+    <span class="rpe-cell">${rpeTargetChipHTML(en, si)}<select data-e="${ei}" data-s="${si}" data-f="rpe">${rpeOptions(st.rpe)}</select></span>
+    <button class="chk ${st.done?"on":""}" data-e="${ei}" data-s="${si}" data-f="done">✓</button>
+  </div>${prBadgeRow(st, ei, si)}`;
+}
+
+/* Does ticking this set END a round, and therefore start the rest clock?
+
+   The second movement of a pair always ends its round. The FIRST movement ends the
+   round only when its partner has no set left at that index, which is exactly the
+   uneven-pair case: on Legs A the third calf raise has no ab crunch after it, so the
+   rest has to start there or the clock never runs for that round at all. */
+function endsRound(entries, ei, si){
+  const info = supersetInfo(entries, ei);
+  if(!info) return true;                       // not in a pair, normal behaviour
+  if(info.role === "second") return true;
+  const partner = entries[ei + 1];
+  return !(partner && partner.sets && partner.sets[si]);
+}
+function supersetRounds(a, i){
+  const A = a.entries[i], B = a.entries[i+1];
+  return Math.max(A ? A.sets.length : 0, B ? B.sets.length : 0);
+}
+/* The whole pair as one card of rounds. */
+function supersetGroupHTML(a, i, tips, tipsSeen){
+  const pair = [{en: a.entries[i], ei: i}, {en: a.entries[i+1], ei: i+1}];
+  const rounds = supersetRounds(a, i);
+  const isLastPairInSession = (i + 1) === a.entries.length - 1;
+
+  const meta = pair.map(p=>{
+    const occ = occIndex(a.entries, p.ei);
+    const anyDay = p.en.fin || sharedAcrossDays(p.en.name);
+    return {
+      last: lastSetsFor(a.workoutId, p.en.name, anyDay, occ),
+      box:  lastBox(a.workoutId, p.en.name, anyDay, occ)
+    };
+  });
+
+  let h = `<div class="card ex ss-group">
+    <div class="ss-hdr">
+      <span class="ss-hdr-t">Superset &middot; ${rounds} round${rounds===1?"":"s"}</span>
+      <span class="ss-hdr-n">one set of each, back to back</span>
+    </div>`;
+
+  // What the two movements are, once, with their targets and last-time numbers.
+  pair.forEach((p, k)=>{
+    h += `<div class="ss-leg">
+      <div class="ss-leg-h">
+        <b>${esc(p.en.name)}</b>
+        <span class="ex-target">${p.en.sets.length}×${esc(p.en.reps||"")}</span>
+        <span class="icon-btns ex-ctl">
+          <button data-addset="${p.ei}" aria-label="Add a set to ${esc(p.en.name)}">+</button>
+          <button data-rmset="${p.ei}" aria-label="Remove a set from ${esc(p.en.name)}">−</button>
+          <button data-exskip="${p.ei}" aria-label="Skip ${esc(p.en.name)} today">✕</button>
+        </span>
+      </div>
+      ${p.en.note?`<div class="ex-note">${esc(p.en.note)}</div>`:""}
+      ${p.en.warm ? warmupHTML(p.en, p.en.warm) : ""}
+      ${meta[k].box || ""}
+      ${inlineTipHTML(tips[nrm(p.en.name)], tipsSeen)}
+      ${p.en.startSide ? altHintHTML(p.en.altStyle||"side", p.en.startSide, p.en.sets.length) : ""}
+      ${asymHintHTML(p.en)}
+    </div>`;
+  });
+
+  for(let r = 0; r < rounds; r++){
+    const done = pair.every(p => !p.en.sets[r] || p.en.sets[r].done);
+    h += `<div class="ss-round${done?" done":""}">
+      <div class="ss-round-h"><span>Round ${r+1}</span><span class="ss-round-of">of ${rounds}</span></div>`;
+    pair.forEach((p, k)=>{
+      if(!p.en.sets[r]){
+        h += `<div class="ss-mv ss-mv-off">${esc(p.en.name)}
+          <span class="ss-mv-none">no set this round</span></div>`;
+        return;
+      }
+      h += `<div class="ss-mv">${esc(p.en.name)}</div>`;
+      h += setRowHTML(p.en, p.ei, r, meta[k].last, "");
+    });
+    // the rest belongs to the round, not to either movement
+    const lastRound = r === rounds - 1;
+    h += `<div class="ss-rest">${
+      lastRound && isLastPairInSession
+        ? "Last round of the session, no rest needed"
+        : "Rest after this round"
+    }</div></div>`;
+  }
+  return h + `</div>`;
 }
 
 /* ---------- cycle review ---------- */
@@ -8456,6 +9161,7 @@ async function gistFetch(path, opts={}){
 function payload(){
   return JSON.stringify({program:S.program, pointer:S.pointer, cycleStart:S.cycleStart, cycleDone:S.cycleDone, restDays:S.restDays||[], restLog:S.restLog||[], lastCycle:S.lastCycle||null, lastReview:S.lastReview||null, checkins:S.checkins||{}, exAliases:S.exAliases||{}, stalls:S.stalls||{}, deload:S.deload||null,
     blockStart:S.blockStart||null, planStart:S.planStart||null, wakeTime:S.wakeTime||null, sleepTarget:S.sleepTarget||null,
+    asymRetired:S.asymRetired||{}, asymRetest:S.asymRetest||null,
     volWindow:S.volWindow||"cycle", askWhy:S.askWhy!==false, deleted:(S.deleted||[]).slice(-500), planLog:(S.planLog||[]).slice(-500), sessions:S.sessions, savedAt:S.savedAt}, null, 1);
 }
 async function connectGist(){
