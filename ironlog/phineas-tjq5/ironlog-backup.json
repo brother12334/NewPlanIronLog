@@ -1,0 +1,669 @@
+{
+ "program": {
+  "pushA": [
+   {
+    "name": "Smith Flat Bench Press",
+    "sets": 4,
+    "reps": "6-10",
+    "rpes": [
+     7,
+     8,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 115,
+    "note": "25 lb bar + 45 a side. Touch chest, no bounce",
+    "rest": [
+     180,
+     240
+    ]
+   },
+   {
+    "name": "Incline Dumbbell Bench Press",
+    "sets": 3,
+    "reps": "8-10",
+    "rpes": [
+     7,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 35,
+    "note": "35 lb a hand, 30 degree bench",
+    "rest": [
+     120,
+     180
+    ]
+   },
+   {
+    "name": "Mid Cable Fly (on bench)",
+    "sets": 3,
+    "reps": "12-15",
+    "rpes": [
+     8,
+     9,
+     9
+    ],
+    "rpe": "8-9",
+    "weight": 45,
+    "note": "Hold the stretch behind the torso line",
+    "rest": [
+     90,
+     150
+    ]
+   },
+   {
+    "name": "Dumbbell Lateral Raise",
+    "sets": 3,
+    "reps": "12-20",
+    "rpes": [
+     8,
+     9,
+     10
+    ],
+    "rpe": "8-10",
+    "weight": null,
+    "note": "Both dumbbells together",
+    "rest": [
+     90,
+     150
+    ],
+    "superset": "pushA-delt-tri",
+    "calibrate": 15
+   },
+   {
+    "name": "Overhead Cable Triceps Extension",
+    "sets": 3,
+    "reps": "8-12",
+    "rpes": [
+     8,
+     9,
+     9
+    ],
+    "rpe": "8-9",
+    "weight": 90,
+    "note": "Straight bar behind head, elbows high and close",
+    "rest": [
+     120,
+     180
+    ]
+   }
+  ],
+  "pullA": [
+   {
+    "name": "Chest Supported Row Machine",
+    "sets": 4,
+    "reps": "6-10",
+    "rpes": [
+     7,
+     8,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 140,
+    "note": "Lower back stays out of it",
+    "rest": [
+     180,
+     240
+    ]
+   },
+   {
+    "name": "Lat Pulldown",
+    "sets": 3,
+    "reps": "8-12",
+    "rpes": [
+     7,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 130,
+    "note": "Neutral or slightly wide grip",
+    "rest": [
+     120,
+     180
+    ]
+   },
+   {
+    "name": "Cable Lat Prayer",
+    "sets": 3,
+    "reps": "12-15",
+    "rpes": [
+     8,
+     9,
+     9
+    ],
+    "rpe": "8-9",
+    "weight": 75,
+    "note": "Straight arms, hinged at hip, shoulders fully overhead",
+    "rest": [
+     90,
+     150
+    ]
+   },
+   {
+    "name": "Cable Reverse Rear Delt Fly",
+    "sets": 3,
+    "reps": "15-20",
+    "rpes": [
+     8,
+     9,
+     9
+    ],
+    "rpe": "8-9",
+    "weight": 30,
+    "note": "Crossover, swap which arm is on top each set · both arms, alternate which arm crosses on top each set",
+    "rest": [
+     90,
+     150
+    ],
+    "superset": "pullA-delt-trap"
+   },
+   {
+    "name": "Dumbbell Shrug",
+    "sets": 2,
+    "reps": "10-15",
+    "rpes": [
+     9,
+     9
+    ],
+    "rpe": "9",
+    "weight": 50,
+    "note": "50 lb a hand. Straight up, 1-sec squeeze, no rolling",
+    "rest": [
+     90,
+     150
+    ]
+   },
+   {
+    "name": "Incline Dumbbell Curl",
+    "sets": 3,
+    "reps": "8-12",
+    "rpes": [
+     8,
+     9,
+     9
+    ],
+    "rpe": "8-9",
+    "weight": 30,
+    "note": "30 lb a hand, 45 degree bench, arms behind torso",
+    "rest": [
+     120,
+     180
+    ],
+    "incr": 2.5
+   },
+   {
+    "name": "Single-Arm Cable Hammer Curl",
+    "sets": 2,
+    "reps": "10-15",
+    "rpes": [
+     9,
+     10
+    ],
+    "rpe": "9-10",
+    "weight": 30,
+    "note": "Low pulley, D-handle, elbow pinned · single arm, alternate L/R each set",
+    "rest": [
+     90,
+     150
+    ]
+   }
+  ],
+  "legsA": [
+   {
+    "name": "Smith Machine Squat",
+    "sets": 4,
+    "reps": "6-10",
+    "rpes": [
+     7,
+     8,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 75,
+    "note": "Heels elevated on plates, full depth",
+    "rest": [
+     180,
+     300
+    ]
+   },
+   {
+    "name": "Dumbbell Bulgarian Split Squat",
+    "sets": 4,
+    "reps": "8-12",
+    "rpes": [
+     7,
+     8,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 25,
+    "note": "25 lb a hand. Upright torso, long stride · single arm, alternate L/R each set",
+    "rest": [
+     120,
+     180
+    ],
+    "rampIn": 2
+   },
+   {
+    "name": "Leg Extension",
+    "sets": 2,
+    "reps": "10-15",
+    "rpes": [
+     8,
+     9
+    ],
+    "rpe": "8-9",
+    "weight": 70,
+    "note": "Load cut from 85, which was failure at 9 reps",
+    "rest": [
+     90,
+     150
+    ]
+   },
+   {
+    "name": "Seated Leg Curl",
+    "sets": 3,
+    "reps": "8-12",
+    "rpes": [
+     7,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 100,
+    "note": "Seated, not lying. Hip flexion means a longer hamstring",
+    "rest": [
+     120,
+     180
+    ],
+    "rampIn": 2
+   },
+   {
+    "name": "Standing Calf Raise (Smith)",
+    "sets": 3,
+    "reps": "8-12",
+    "rpes": [
+     8,
+     9,
+     10
+    ],
+    "rpe": "8-10",
+    "weight": 35,
+    "note": "Knee straight for gastrocnemius. 2-sec bottom pause",
+    "rest": [
+     90,
+     150
+    ],
+    "superset": "legsA-calf-ab"
+   },
+   {
+    "name": "Cable Ab Crunch",
+    "sets": 2,
+    "reps": "10-15",
+    "rpes": [
+     9,
+     10
+    ],
+    "rpe": "9-10",
+    "weight": 150,
+    "note": "Round the spine against the load",
+    "rest": [
+     90,
+     150
+    ]
+   }
+  ],
+  "pushB": [
+   {
+    "name": "Incline Smith Machine Bench Press",
+    "sets": 4,
+    "reps": "6-10",
+    "rpes": [
+     7,
+     8,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 95,
+    "note": "25 lb bar + 35 a side, 30 degrees",
+    "rest": [
+     180,
+     240
+    ]
+   },
+   {
+    "name": "Weighted Chest Dips",
+    "sets": 3,
+    "reps": "8-12",
+    "rpes": [
+     7,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": null,
+    "note": "Bodyweight to start. Forward lean, elbows out, full depth",
+    "rest": [
+     120,
+     180
+    ]
+   },
+   {
+    "name": "Flat Dumbbell Bench Press",
+    "sets": 2,
+    "reps": "10-15",
+    "rpes": [
+     9,
+     9
+    ],
+    "rpe": "9",
+    "weight": 40,
+    "note": "40 lb a hand. Accessory now, not max effort. Deep stretch, no lockout",
+    "rest": [
+     120,
+     180
+    ]
+   },
+   {
+    "name": "Smith Machine Shoulder Press",
+    "sets": 3,
+    "reps": "6-10",
+    "rpes": [
+     7,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 45,
+    "note": "25 lb bar + 10 a side",
+    "rest": [
+     120,
+     180
+    ]
+   },
+   {
+    "name": "Dumbbell Lateral Raise",
+    "sets": 3,
+    "reps": "12-20",
+    "rpes": [
+     8,
+     9,
+     10
+    ],
+    "rpe": "8-10",
+    "weight": null,
+    "note": "Both dumbbells together, match Push A",
+    "rest": [
+     90,
+     150
+    ],
+    "superset": "pushB-delt-tri",
+    "calibrate": 15
+   },
+   {
+    "name": "Overhead Cable Extension (V-bar)",
+    "sets": 3,
+    "reps": "10-14",
+    "rpes": [
+     8,
+     9,
+     9
+    ],
+    "rpe": "8-9",
+    "weight": null,
+    "note": "Bilateral, V-handle. Different implement to Push A's straight bar. Elbows high and close",
+    "rest": [
+     90,
+     150
+    ],
+    "calibrate": 75
+   }
+  ],
+  "pullB": [
+   {
+    "name": "Weighted Pull-Up",
+    "sets": 4,
+    "reps": "5-10",
+    "rpes": [
+     7,
+     8,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": null,
+    "note": "Bodyweight to start. Dead hang, chest to bar",
+    "rest": [
+     180,
+     240
+    ],
+    "rampIn": 2
+   },
+   {
+    "name": "Single-Arm Dumbbell Row",
+    "sets": 3,
+    "reps": "8-12",
+    "rpes": [
+     7,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 50,
+    "note": "Pull to hip, shoulder blade travels forward at the bottom · single arm, alternate L/R each set",
+    "rest": [
+     120,
+     180
+    ]
+   },
+   {
+    "name": "Single-Arm Cable Pulldown",
+    "sets": 2,
+    "reps": "12-15",
+    "rpes": [
+     9,
+     9
+    ],
+    "rpe": "9",
+    "weight": 50,
+    "note": "Kneeling, full overhead reach, slight lean away · single arm, alternate L/R each set",
+    "rest": [
+     90,
+     150
+    ]
+   },
+   {
+    "name": "Cable Face Pull (two D-handles)",
+    "sets": 3,
+    "reps": "15-20",
+    "rpes": [
+     8,
+     9,
+     9
+    ],
+    "rpe": "8-9",
+    "weight": 20,
+    "note": "Bilateral, one D-handle a tower at eye height. Pull toward the ears, rotate knuckles back",
+    "rest": [
+     90,
+     150
+    ],
+    "superset": "pullB-face-curl"
+   },
+   {
+    "name": "Preacher Curl",
+    "sets": 3,
+    "reps": "8-12",
+    "rpes": [
+     8,
+     9,
+     9
+    ],
+    "rpe": "8-9",
+    "weight": 30,
+    "note": "No preacher bench here: set the adjustable bench to about 75 degrees, stand behind it, drape the upper arm over the top pad · single arm, alternate L/R each set",
+    "rest": [
+     120,
+     180
+    ],
+    "incr": 2.5
+   },
+   {
+    "name": "Bayesian Cable Curl",
+    "sets": 3,
+    "reps": "10-15",
+    "rpes": [
+     8,
+     9,
+     10
+    ],
+    "rpe": "8-10",
+    "weight": 25,
+    "note": "Cable low and behind, elbow behind torso for a full stretch",
+    "rest": [
+     90,
+     150
+    ],
+    "incr": 2.5
+   }
+  ],
+  "legsB": [
+   {
+    "name": "Dumbbell RDL",
+    "sets": 4,
+    "reps": "8-12",
+    "rpes": [
+     7,
+     8,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 50,
+    "note": "50 lb a hand. Hips back, stop when the hamstrings stop lengthening. Straps ok",
+    "rest": [
+     180,
+     240
+    ]
+   },
+   {
+    "name": "Smith Machine Hip Thrust",
+    "sets": 3,
+    "reps": "8-12",
+    "rpes": [
+     7,
+     8,
+     9
+    ],
+    "rpe": "7-9",
+    "weight": 115,
+    "note": "Chin tucked, 1-sec squeeze at lockout",
+    "rest": [
+     120,
+     180
+    ]
+   },
+   {
+    "name": "Seated Leg Curl",
+    "sets": 3,
+    "reps": "12-20",
+    "rpes": [
+     8,
+     9,
+     9
+    ],
+    "rpe": "8-9",
+    "weight": 75,
+    "note": "Same machine as Legs A, run lighter and higher-rep",
+    "rest": [
+     90,
+     150
+    ],
+    "rampIn": 2
+   },
+   {
+    "name": "Reverse Hyperextension (flat bench)",
+    "sets": 2,
+    "reps": "10-15",
+    "rpes": [
+     8,
+     9
+    ],
+    "rpe": "8-9",
+    "weight": null,
+    "note": "Face down on a flat bench, hips at the edge, legs hanging, raise to horizontal. Add a dumbbell between the feet once 15 reps clear",
+    "rest": [
+     90,
+     150
+    ],
+    "superset": "legsB-hyper-calf",
+    "rampIn": 2
+   },
+   {
+    "name": "Seated Calf Raise (Smith)",
+    "sets": 4,
+    "reps": "10-15",
+    "rpes": [
+     8,
+     9,
+     9,
+     10
+    ],
+    "rpe": "8-10",
+    "weight": null,
+    "note": "Bench under the bar, bar padded across the KNEES, feet on a plate so the heels drop below. Knee bent for soleus",
+    "rest": [
+     90,
+     150
+    ],
+    "calibrate": 45,
+    "rampIn": 2
+   },
+   {
+    "name": "Hanging Leg Raise",
+    "sets": 2,
+    "reps": "8-15",
+    "rpes": [
+     9,
+     10
+    ],
+    "rpe": "9-10",
+    "weight": null,
+    "note": "Curl the pelvis up, don't just raise the legs",
+    "rest": [
+     90,
+     150
+    ]
+   }
+  ],
+  "finisher": []
+ },
+ "pointer": 0,
+ "cycleStart": 1785643200000,
+ "cycleDone": [],
+ "restDays": [],
+ "restLog": [],
+ "lastCycle": null,
+ "lastReview": null,
+ "checkins": {},
+ "exAliases": {},
+ "stalls": {},
+ "deload": null,
+ "blockStart": 1785725804801,
+ "planStart": 1785725804801,
+ "wakeTime": "09:00",
+ "sleepTarget": null,
+ "volWindow": "cycle",
+ "askWhy": true,
+ "deleted": [],
+ "planLog": [],
+ "sessions": [],
+ "savedAt": 1785725905238
+}
