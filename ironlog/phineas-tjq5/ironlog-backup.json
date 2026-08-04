@@ -102,7 +102,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 140,
+    "weight": 145,
     "note": "Lower back stays out of it",
     "rest": [
      180,
@@ -930,6 +930,17 @@
     "Re-weighted away from failure: 51 of 108 sets now target RPE 8 or below"
    ],
    "note": "Sessions, check-ins, rest days and sync settings were left untouched."
+  },
+  {
+   "at": 1785802942407,
+   "date": "2026-08-03",
+   "day": null,
+   "kind": "weight",
+   "name": "Chest Supported Row Machine",
+   "changes": [
+    "140 lb → 145 lb"
+   ],
+   "note": "Double progression: last set cleared the top of the rep range at target RPE."
   }
  ],
  "sessions": [
@@ -7140,5 +7151,5 @@
    }
   }
  ],
- "savedAt": 1785802908430
+ "savedAt": 1785802942409
 }
