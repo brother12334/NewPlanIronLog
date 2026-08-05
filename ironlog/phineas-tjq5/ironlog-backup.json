@@ -645,18 +645,19 @@
   ],
   "finisher": []
  },
- "pointer": 2,
+ "pointer": 3,
  "cycleStart": 1785384000000,
  "cycleDone": [
   0,
-  1
+  1,
+  2
  ],
- "restDays": [
-  "2026-07-31"
- ],
+ "restDays": [],
  "restLog": [
   "2026-07-14",
-  "2026-07-15",
+  "2026-07-15"
+ ],
+ "restDeleted": [
   "2026-07-31"
  ],
  "lastCycle": {
@@ -828,6 +829,10 @@
   },
   "2026-08-02": {
    "energy": "6"
+  },
+  "2026-08-03": {
+   "sleep": "8",
+   "energy": "5"
   }
  },
  "exAliases": {},
@@ -903,13 +908,49 @@
    "dates": [
     "2026-08-03"
    ]
+  },
+  "smith machine squat": {
+   "n": 1,
+   "dates": [
+    "2026-08-04"
+   ]
+  },
+  "dumbbell bulgarian split squat": {
+   "n": 0,
+   "dates": [
+    "2026-08-04"
+   ]
+  },
+  "leg extension": {
+   "n": 1,
+   "dates": [
+    "2026-08-04"
+   ]
+  },
+  "leg curl": {
+   "n": 0,
+   "dates": [
+    "2026-08-04"
+   ]
+  },
+  "standing calf raise smith": {
+   "n": 0,
+   "dates": [
+    "2026-08-04"
+   ]
+  },
+  "cable ab crunch": {
+   "n": 0,
+   "dates": [
+    "2026-08-04"
+   ]
   }
  },
  "deload": null,
  "blockStart": 1785796263882,
  "planStart": 1785796263882,
- "wakeTime": "11:00",
- "sleepTarget": null,
+ "wakeTime": null,
+ "sleepTarget": 8,
  "asymRetired": {},
  "asymRetest": null,
  "volWindow": "cycle",
@@ -939,6 +980,28 @@
    "name": "Chest Supported Row Machine",
    "changes": [
     "140 lb → 145 lb"
+   ],
+   "note": "Double progression: last set cleared the top of the rep range at target RPE."
+  },
+  {
+   "at": 1785875562954,
+   "date": "2026-08-04",
+   "day": null,
+   "kind": "weight",
+   "name": "Chest Supported Row Machine",
+   "changes": [
+    "145 lb → 145 lb"
+   ],
+   "note": "Double progression: last set cleared the top of the rep range at target RPE."
+  },
+  {
+   "at": 1785875564122,
+   "date": "2026-08-04",
+   "day": null,
+   "kind": "weight",
+   "name": "Chest Supported Row Machine",
+   "changes": [
+    "145 lb → 145 lb"
    ],
    "note": "Double progression: last set cleared the top of the rep range at target RPE."
   }
@@ -7149,7 +7212,532 @@
     "when": 1785802908428,
     "v": 2
    }
+  },
+  {
+   "id": "msfbn8audncef",
+   "workoutId": "legsA",
+   "date": "2026-08-04",
+   "startedAt": 1785888067785,
+   "finishedAt": 1785893563628,
+   "entries": [
+    {
+     "name": "Smith Machine Squat",
+     "reps": "6-10",
+     "rpe": "7-9",
+     "note": "Heels elevated on plates, full depth",
+     "rpes": [
+      7,
+      8,
+      8,
+      9
+     ],
+     "warm": "full",
+     "planWeight": 75,
+     "rest": [
+      180,
+      300
+     ],
+     "sets": [
+      {
+       "weight": "12.5",
+       "reps": "10",
+       "rpe": "7.5",
+       "done": true,
+       "rest": 167
+      },
+      {
+       "weight": "15",
+       "reps": "10",
+       "rpe": "8",
+       "done": true,
+       "rest": 244
+      },
+      {
+       "weight": "17.5",
+       "reps": "9",
+       "rpe": "8",
+       "done": true,
+       "rest": 449
+      },
+      {
+       "weight": "17.5",
+       "reps": "4",
+       "rpe": "10",
+       "done": true,
+       "why": {
+        "code": "fatigue",
+        "note": "",
+        "at": 1785889491432,
+        "missBy": 2
+       },
+       "rest": 347
+      }
+     ],
+     "whyAsked": true
+    },
+    {
+     "name": "Dumbbell Bulgarian Split Squat",
+     "reps": "8-12",
+     "rpe": "7-9",
+     "note": "25 lb a hand. Upright torso, long stride · single arm, alternate L/R each set",
+     "rpes": [
+      7,
+      8
+     ],
+     "warm": "light",
+     "planWeight": 25,
+     "rest": [
+      120,
+      180
+     ],
+     "altStyle": "side",
+     "startSide": "R",
+     "sets": [
+      {
+       "weight": "10",
+       "reps": "5",
+       "rpe": "7.5",
+       "done": true,
+       "why": {
+        "code": "form",
+        "note": "",
+        "at": 1785890005675,
+        "missBy": 3
+       },
+       "rest": 292
+      },
+      {
+       "weight": "10",
+       "reps": "4",
+       "rpe": "9.5",
+       "done": true,
+       "rest": 442
+      }
+     ],
+     "whyAsked": true
+    },
+    {
+     "name": "Leg Extension",
+     "reps": "10-15",
+     "rpe": "8-9",
+     "note": "Load cut from 85, which was failure at 9 reps",
+     "rpes": [
+      8,
+      9
+     ],
+     "planWeight": 70,
+     "rest": [
+      90,
+      150
+     ],
+     "sets": [
+      {
+       "weight": "70",
+       "reps": "6",
+       "rpe": "10",
+       "done": true,
+       "why": {
+        "code": "fatigue",
+        "note": "",
+        "at": 1785890853850,
+        "missBy": 4
+       },
+       "rest": 149
+      },
+      {
+       "weight": "55",
+       "reps": "6",
+       "rpe": "9.5",
+       "done": true,
+       "rest": 527
+      }
+     ],
+     "whyAsked": true
+    },
+    {
+     "name": "Seated Leg Curl",
+     "reps": "8-12",
+     "rpe": "7-9",
+     "note": "Seated, not lying. Hip flexion means a longer hamstring",
+     "rpes": [
+      7,
+      8
+     ],
+     "planWeight": 100,
+     "rest": [
+      120,
+      180
+     ],
+     "sets": [
+      {
+       "weight": "155",
+       "reps": "9",
+       "rpe": "7",
+       "done": true,
+       "pr": "WEIGHT PR",
+       "rest": 127
+      },
+      {
+       "weight": "155",
+       "reps": "8",
+       "rpe": "10",
+       "done": true,
+       "rest": 1071
+      }
+     ]
+    },
+    {
+     "name": "Standing Calf Raise (Smith)",
+     "reps": "8-12",
+     "rpe": "8-10",
+     "note": "Knee straight for gastrocnemius. 2-sec bottom pause",
+     "rpes": [
+      8,
+      9,
+      10
+     ],
+     "planWeight": 35,
+     "rest": [
+      90,
+      150
+     ],
+     "superset": "legsA-calf-ab",
+     "sets": [
+      {
+       "weight": "35",
+       "reps": "13",
+       "rpe": "7.5",
+       "done": true
+      },
+      {
+       "weight": "35",
+       "reps": "17",
+       "rpe": "8.5",
+       "done": true,
+       "pr": "REP PR"
+      },
+      {
+       "weight": "35",
+       "reps": "14",
+       "rpe": "9",
+       "done": true,
+       "rest": 31
+      }
+     ]
+    },
+    {
+     "name": "Cable Ab Crunch",
+     "reps": "10-15",
+     "rpe": "9-10",
+     "note": "Round the spine against the load",
+     "rpes": [
+      9,
+      10
+     ],
+     "planWeight": 150,
+     "rest": [
+      90,
+      150
+     ],
+     "sets": [
+      {
+       "weight": "160",
+       "reps": "11",
+       "rpe": "7.5",
+       "done": true,
+       "rest": 115
+      },
+      {
+       "weight": "170",
+       "reps": "7",
+       "rpe": "8.5",
+       "done": true,
+       "pr": "WEIGHT PR"
+      }
+     ]
+    }
+   ],
+   "note": "Felt fatigued and tired, lots of burning pain in Smith Machine Squats and Bulgarian Split Squats",
+   "feel": 2,
+   "progression": [
+    {
+     "name": "Smith Machine Squat",
+     "kind": "hold",
+     "msg": "Need 10 on the last set to move up",
+     "sub": "Last set was 4 reps at 17.5 lb. 6 more and the load goes up 10 lb."
+    },
+    {
+     "name": "Dumbbell Bulgarian Split Squat",
+     "kind": "hold",
+     "msg": "Need 12 on the last set to move up",
+     "sub": "Last set was 4 reps at 10 lb. 8 more and the load goes up 5 lb."
+    },
+    {
+     "name": "Leg Extension",
+     "kind": "toohard",
+     "detail": {
+      "at": {
+       "w": 70,
+       "reps": 6,
+       "rpe": 10,
+       "date": "2026-08-04"
+      },
+      "msg": "70 lb for 10-15 reps is not reachable: you have already hit RPE 10 at 70 lb for only 6 reps.",
+      "fix": "Drop to about 60 lb and earn the range back."
+     }
+    },
+    {
+     "name": "Seated Leg Curl",
+     "kind": "hold",
+     "msg": "Need 12 on the last set to move up",
+     "sub": "Last set was 8 reps at 155 lb. 4 more and the load goes up 5 lb."
+    },
+    {
+     "name": "Standing Calf Raise (Smith)",
+     "kind": "up",
+     "from": 35,
+     "to": 45,
+     "step": {
+      "amount": 10,
+      "alt": 20,
+      "unit": "lb total",
+      "why": "Smith bar, lower body, 10 to 20 lb"
+     },
+     "msg": "Add weight next time: 35 lb → 45 lb",
+     "sub": "Last set hit 14 reps, the top of 8-12, at RPE 9 against a target of 10. Rebuild from 8 reps at the new load."
+    },
+    {
+     "name": "Cable Ab Crunch",
+     "kind": "toohard",
+     "detail": {
+      "at": {
+       "w": 160,
+       "reps": 6,
+       "rpe": 9.5,
+       "date": "2026-07-26"
+      },
+      "msg": "150 lb for 10-15 reps is not reachable: you have already hit RPE 9.5 at 160 lb for only 6 reps.",
+      "fix": "Drop to about 140 lb and earn the range back."
+     }
+    }
+   ],
+   "quality": {
+    "total": 79,
+    "max": 100,
+    "pct": 0.794,
+    "grade": "C+",
+    "sections": [
+     {
+      "key": "completion",
+      "label": "Completion",
+      "max": 14,
+      "pts": 14,
+      "pct": 1,
+      "grade": "A+",
+      "why": [
+       "15 working sets logged against 15 planned (100%).",
+       "Everything on the card got done."
+      ],
+      "tip": null,
+      "ex": null
+     },
+     {
+      "key": "overload",
+      "label": "Progressive overload",
+      "max": 20,
+      "pts": 12,
+      "pct": 0.6,
+      "grade": "D",
+      "why": [
+       "3 of 5 lifts went up, 0 held, 2 went down.",
+       "Personal records today: Seated Leg Curl, Standing Calf Raise (Smith), Cable Ab Crunch.",
+       "Up: Seated Leg Curl (189→202 est. 1RM), Standing Calf Raise (Smith) (49→49 est. 1RM), Cable Ab Crunch (224→219 est. 1RM).",
+       "Down: Smith Machine Squat (24→23 est. 1RM), Leg Extension (113→84 est. 1RM).",
+       "On Smith Machine Squat: you logged ran out of gas on it, and the comparison comes from a legs session rather than the same rotation day.",
+       "On Leg Extension: you logged ran out of gas on it, and the comparison comes from a legs session rather than the same rotation day."
+      ],
+      "tip": "Most things moved, but Smith Machine Squat and Leg Extension went backwards. If that keeps happening, try moving Leg Extension earlier, while you're still fresh.",
+      "ex": "Leg Extension"
+     },
+     {
+      "key": "intensity",
+      "label": "Effective intensity",
+      "max": 16,
+      "pts": 12.7,
+      "pct": 0.7916666666666666,
+      "grade": "C+",
+      "why": [
+       "8 of 15 sets hit their prescribed RPE target (within 0.5).",
+       "4 sets went harder than prescribed, mostly Smith Machine Squat. Training past the target costs recovery this plan has already budgeted.",
+       "3 sets stopped further from failure than prescribed, mostly Cable Ab Crunch.",
+       "Average RPE 8.5 across 15 scored sets."
+      ],
+      "tip": null,
+      "ex": "Smith Machine Squat"
+     },
+     {
+      "key": "rest",
+      "label": "Rest discipline",
+      "max": 12,
+      "pts": 9.6,
+      "pct": 0.8000757575757577,
+      "grade": "B−",
+      "why": [
+       "4 of 11 timed rests sat inside the window that set's load called for.",
+       "3 rests ran well past the window, which stretches the session without adding stimulus.",
+       "Set mix: 4 heavy, 4 compound, 3 isolation.",
+       "4 of 15 sets weren't timed, so this is graded on the ones that were."
+      ],
+      "tip": null,
+      "ex": null
+     },
+     {
+      "key": "reprange",
+      "label": "Rep-range adherence",
+      "max": 10,
+      "pts": 6.7,
+      "pct": 0.67,
+      "grade": "D",
+      "why": [
+       "6 of 15 sets finished inside their prescribed rep range.",
+       "3 sets went over the top of the range (mostly Standing Calf Raise (Smith)), so that load has become too light.",
+       "6 sets fell short (mostly Dumbbell Bulgarian Split Squat), so the load is likely too heavy for that range."
+      ],
+      "tip": "Dropping below the range means the load is winning. Come down slightly and earn the reps back.",
+      "ex": "Dumbbell Bulgarian Split Squat"
+     },
+     {
+      "key": "fatigue",
+      "label": "Fatigue management",
+      "max": 10,
+      "pts": 10,
+      "pct": 1,
+      "grade": "A+",
+      "why": [
+       "Reps fell 24% on average from first set to last at the same load. Up to about 25% is normal.",
+       "Steep drop-off on Smith Machine Squat (10→4), Cable Ab Crunch (11→7)."
+      ],
+      "tip": "A collapse like that is nearly always too little rest or too heavy an opening set. Rest longer, or start about 5 lb lighter and hold the reps.",
+      "ex": "Smith Machine Squat"
+     },
+     {
+      "key": "efficiency",
+      "label": "Session efficiency",
+      "max": 8,
+      "pts": 5.9,
+      "pct": 0.7410309598111193,
+      "grade": "C",
+      "why": [
+       "92 minutes for 15 working sets, 9.8 sets per hour.",
+       "Long session. Past about 80 minutes, focus and set quality tend to fall off."
+      ],
+      "tip": "Around 9.8 sets an hour means a lot of standing around. Supersetting unrelated accessories is free time.",
+      "ex": null
+     },
+     {
+      "key": "logquality",
+      "label": "Log quality",
+      "max": 10,
+      "pts": 8.5,
+      "pct": 0.85,
+      "grade": "B",
+      "why": [
+       "Captured: RPE logged on 100% of sets, rest timed on most sets, session feel rated, session note written.",
+       "Missing: no daily check-in for this date.",
+       "This is what makes every other section, and your Body map, accurate rather than guesswork."
+      ],
+      "tip": "Each missing field is a place the analysis has to guess. RPE and rest are the two that matter most.",
+      "ex": null
+     }
+    ],
+    "skipped": [],
+    "prs": [
+     {
+      "name": "Seated Leg Curl",
+      "set": 1,
+      "kind": "WEIGHT PR",
+      "weight": "155",
+      "reps": "9"
+     },
+     {
+      "name": "Standing Calf Raise (Smith)",
+      "set": 2,
+      "kind": "REP PR",
+      "weight": "35",
+      "reps": "17"
+     },
+     {
+      "name": "Cable Ab Crunch",
+      "set": 2,
+      "kind": "WEIGHT PR",
+      "weight": "170",
+      "reps": "7"
+     }
+    ],
+    "flags": [
+     {
+      "name": "Smith Machine Squat",
+      "set": 4,
+      "code": "fatigue",
+      "note": "",
+      "at": 1785889491432,
+      "missBy": 2
+     },
+     {
+      "name": "Dumbbell Bulgarian Split Squat",
+      "set": 1,
+      "code": "form",
+      "note": "",
+      "at": 1785890005675,
+      "missBy": 3
+     },
+     {
+      "name": "Leg Extension",
+      "set": 1,
+      "code": "fatigue",
+      "note": "",
+      "at": 1785890853850,
+      "missBy": 4
+     }
+    ],
+    "advice": [
+     {
+      "key": "overload",
+      "label": "Progressive overload",
+      "text": "Most things moved, but Smith Machine Squat and Leg Extension went backwards. If that keeps happening, try moving Leg Extension earlier, while you're still fresh.",
+      "ex": "Leg Extension",
+      "lost": 8,
+      "na": false
+     },
+     {
+      "key": "reprange",
+      "label": "Rep-range adherence",
+      "text": "Dropping below the range means the load is winning. Come down slightly and earn the reps back.",
+      "ex": "Dumbbell Bulgarian Split Squat",
+      "lost": 3.3,
+      "na": false
+     },
+     {
+      "key": "efficiency",
+      "label": "Session efficiency",
+      "text": "Around 9.8 sets an hour means a lot of standing around. Supersetting unrelated accessories is free time.",
+      "ex": null,
+      "lost": 2.0999999999999996,
+      "na": false
+     },
+     {
+      "key": "logquality",
+      "label": "Log quality",
+      "text": "Each missing field is a place the analysis has to guess. RPE and rest are the two that matter most.",
+      "ex": null,
+      "lost": 1.5,
+      "na": false
+     }
+    ],
+    "when": 1785893563645,
+    "v": 2
+   }
   }
  ],
- "savedAt": 1785802942409
+ "savedAt": 1785893563646
 }
