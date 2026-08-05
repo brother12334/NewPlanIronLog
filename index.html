@@ -57,11 +57,6 @@ h1,h2,h3{font-family:var(--disp);text-transform:uppercase;letter-spacing:.04em;m
   opacity:.34;transition:opacity .15s, transform .15s;
 }
 .plate.done{opacity:.85}
-/* A slot the rotation has already moved past. The schedule is fixed, so these are
-   history, not choices: they stay visible (you still want to see what you've done)
-   but they don't take a tap. */
-.plate.past{cursor:default}
-.plate.past:active{transform:none}
 .pcheck{
   position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;
   background:var(--ok);color:#0d1a10;font-size:13px;font-weight:700;
@@ -1306,10 +1301,10 @@ const ROTATION = DAYS.slice();
 const META = {
   pushA:{name:"Push A", short:"P1", color:"var(--d-pusha)"},
   pullA:{name:"Pull A", short:"B1", color:"var(--d-pulla)"},
-  legsA:{name:"Legs A", short:"L1", color:"var(--d-legsa)"},
+  legsA:{name:"Legs A", short:"L1", color:"var(--d-legsa)", restAfter:true},
   pushB:{name:"Push B", short:"P2", color:"var(--d-pushb)"},
   pullB:{name:"Pull B", short:"B2", color:"var(--d-pullb)"},
-  legsB:{name:"Legs B", short:"L2", color:"var(--d-legsb)"},
+  legsB:{name:"Legs B", short:"L2", color:"var(--d-legsb)", restAfter:true},
   /* Retired 7-day rotation. Not trainable, never offered in the picker or the Program
      tab, but still resolvable so a session logged in 2026 opens with its real name and
      colour instead of crashing on `m.color`. */
@@ -1351,21 +1346,6 @@ function restDaysThisCycle(){
 function restCreditsLeft(){ return Math.max(0, REST_CREDITS - restDaysThisCycle().length); }
 function isRestDay(date){ return restDaysThisCycle().indexOf(date) > -1; }
 function isRestToday(){ return isRestDay(todayStr()); }
-function takeRestDay(date){
-  const list = restDaysThisCycle();
-  if(list.indexOf(date) > -1) return false;
-  if(list.length >= REST_CREDITS) return false;
-  // logging a day you previously deleted lifts the tombstone, or the next merge would
-  // filter out the day you just took
-  S.restDeleted = restTombstones().filter(d=>d !== date);
-  list.push(date); list.sort();
-  if(!Array.isArray(S.restLog)) S.restLog = [];
-  if(!S.restLog.includes(date)){ S.restLog.push(date); S.restLog.sort(); }
-  return true;
-}
-/* Giving a credit back. `alsoUnlog` separates "I did not actually rest that day",
-   which should leave no trace, from "free the credit but I did rest", which keeps the
-   day in the permanent log. */
 /* Giving a credit back. `alsoUnlog` separates "I did not actually rest that day",
    which should leave no trace, from "free the credit but I did rest", which keeps the
    day in the permanent log.
@@ -1381,11 +1361,67 @@ function restTombstones(){
 }
 function releaseRestDay(date, alsoUnlog){
   S.restDays = restDaysThisCycle().filter(d=>d !== date);
+  // a removed day is no longer a booked one, or the Today card would keep crediting a
+  // Legs session for a rest that is not there
+  S.restAuto = (S.restAuto||[]).filter(d=>d !== date);
   if(alsoUnlog){
     S.restLog = (S.restLog||[]).filter(d=>d !== date);
     const t = restTombstones();
     if(t.indexOf(date) < 0) t.push(date);
   }
+}
+/* =====================================================================
+   RESTS ARE BOOKED, NOT SPENT
+
+   The cycle is Push Pull Legs rest, twice over, so the rest days are not a discretionary
+   allowance any more: they are the day after Legs A and the day after Legs B, and the
+   app books them the moment those sessions are finished rather than waiting to be asked.
+
+   Booking happens AFTER the cycle rolls over, which is what keeps the arithmetic honest.
+   Legs B is the last training day, so finishing it starts a new cycle and clears the
+   spent list; the rest it earns therefore lands in the new cycle, where it is joined by
+   the one from that cycle's own Legs A. Every cycle ends up holding exactly two.
+
+   `S.restAuto` records which dates were booked this way. Nothing in the UI can move or
+   cancel them, so the marker exists to say WHY a day is a rest day rather than to gate
+   an override that no longer exists.                                                  */
+function autoRestDates(){
+  if(!Array.isArray(S.restAuto)) S.restAuto = [];
+  return S.restAuto;
+}
+function isAutoRest(date){ return autoRestDates().indexOf(date) > -1; }
+// which Legs day earned the rest on `date`, so the Today card can name it
+function restEarnedBy(date){
+  const prev = (S.sessions||[]).filter(x=>x.date === prevDayStr(date));
+  const hit = prev.find(x=>{ const m = META[x.workoutId]; return m && m.restAfter; });
+  return hit ? (META[hit.workoutId].name) : null;
+}
+function prevDayStr(dateStr){
+  const d = new Date(dateStr + "T12:00:00");
+  d.setDate(d.getDate() - 1);
+  return d.toLocaleDateString("en-CA");
+}
+function bookRestAfter(wid, sessionDate){
+  const m = META[wid];
+  if(!m || !m.restAfter) return null;
+  const date = dayAfter(sessionDate || todayStr());
+  const list = restDaysThisCycle();
+  if(list.indexOf(date) > -1) return null;         // already booked, finishing twice is harmless
+  /* Deliberately bypasses takeRestDay()'s credit ceiling. A booked rest is structural: if
+     an old hand-taken rest is still occupying a slot it yields, because the programme's
+     shape outranks a day someone tapped. */
+  S.restDeleted = restTombstones().filter(d=>d !== date);
+  list.push(date); list.sort();
+  while(list.length > REST_CREDITS){
+    const drop = list.find(d=>!isAutoRest(d));
+    if(!drop) break;
+    list.splice(list.indexOf(drop), 1);
+  }
+  if(!Array.isArray(S.restLog)) S.restLog = [];
+  if(!S.restLog.includes(date)){ S.restLog.push(date); S.restLog.sort(); }
+  const auto = autoRestDates();
+  if(auto.indexOf(date) < 0){ auto.push(date); auto.sort(); }
+  return date;
 }
 // short label for a rest plate that has already been spent
 function restPlateLabel(date){
@@ -2401,7 +2437,25 @@ const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<"
    runs during load — well before this point in the file — and any migration that wants
    to write a dated entry to the change log calls through here. As a `const` it sat in
    its temporal dead zone at that moment and took the whole script down. */
-function todayStr(){ return new Date().toLocaleDateString("en-CA"); }
+/* The TRAINING day, which is not the calendar day. Sessions here regularly start before
+   midnight and finish after it, and a workout that ends at 2:01 AM belongs to the night
+   it began, not to the morning it spilled into. Everything date-keyed runs through this:
+   session dates, rest days, check-ins, streaks.
+
+   The 4 is written inline rather than lifted into a `const` on purpose. migrate() calls
+   this at load time, before any module-level const has initialised, and a reference to
+   one from here would throw on the temporal dead zone before the app ever painted. */
+function todayStr(){
+  const d = new Date();
+  d.setHours(d.getHours() - 4);
+  return d.toLocaleDateString("en-CA");
+}
+// the training day after a given one, used to book the rest that follows a Legs session
+function dayAfter(dateStr){
+  const d = new Date(dateStr + "T12:00:00");
+  d.setDate(d.getDate() + 1);
+  return d.toLocaleDateString("en-CA");
+}
 const fmtDate = d => new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
 function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2600); }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
@@ -3174,9 +3228,7 @@ function lastEntryFor(workoutId, exName, anyDay, occ){
       const hits = occurrencesIn(s, exName);
       if(!hits.length) continue;
       const e = hits[Math.min(occ, hits.length-1)];
-      // `sess` carries the whole session so callers can read what was decided ABOUT it,
-      // not just what was lifted in it — the warm-up ramp uses its progression verdict.
-      return {sets:e.sets, date:s.date, workoutId:s.workoutId, sameDay:s.workoutId===workoutId, sess:s};
+      return {sets:e.sets, date:s.date, workoutId:s.workoutId, sameDay:s.workoutId===workoutId};
     }
   }
   return null;
@@ -4275,31 +4327,6 @@ function slotWeekday(slotIndex){
   d.setDate(d.getDate() + slotIndex);
   return WEEKDAY_SHORT[d.getDay()];
 }
-/* THE ROTATION ONLY RUNS FORWARDS.
-
-   The plate strip used to let any plate be tapped, which quietly turned a fixed
-   schedule into a menu: one tap and you were back on a day you had already trained,
-   with the cycle's checkmarks and the "since last time" card both describing a session
-   you were about to repeat. This is a set programme — Push A, Pull A, Legs A, rest,
-   Push B, Pull B, Legs B, rest — and the day you re-run is the day at the far end that
-   never gets trained.
-
-   A slot is PAST when the cycle has already spent it: either it is checked off, or the
-   pointer has moved beyond it. Those plates still render (the strip is the clearest
-   picture of where you are in the week) but they no longer take a tap. Jumping FORWARD
-   is still allowed, because equipment being occupied is a real thing and the order of
-   what's left is yours; going backwards is not, because there is nothing left there.
-
-   Starting the cycle over is still one tap away, under "reset cycle". */
-function slotIsPast(i){
-  if(S.cycleDone.includes(i)) return true;
-  /* A cycle with nothing logged in it has not spent anything yet, so it locks nothing.
-     This is what keeps a fresh cycle fully open regardless of where the pointer happens
-     to be sitting — including in saves written before recomputeCycle() started sending
-     the pointer back to the top of the rotation on a wrap. */
-  if(!S.cycleDone.length) return false;
-  return i < S.pointer;
-}
 function plateStrip(){
   const cur = S.pointer;
   const taken = restDaysThisCycle();
@@ -4312,31 +4339,24 @@ function plateStrip(){
       const date = taken[idx] || null;
       const isToday = date === todayStr();
       html += `<button class="plate rest${isToday?" cur":""}${date?" done":""}" data-rest="${idx}"
-        aria-label="Rest ${idx+1} of ${REST_CREDITS}, ${wd}${date?", used "+date:", available"}"
+        aria-label="Rest ${idx+1} of ${REST_CREDITS}, ${wd}${
+          date ? ", booked for "+date : ", books itself after the next Legs day"}"
         >R<small>${wd}</small>${date?'<span class="pcheck">&#10003;</span>':""}</button>`;
       return;
     }
     const i = ROTATION.indexOf(key);
     const m = dayMeta(key);
     const done = S.cycleDone.includes(i);
-    /* The rotation only runs forwards. A slot that is already done, or that the pointer
-       has moved past, is a day the cycle has spent, so it is rendered as a record rather
-       than as something you can jump back onto. See slotIsPast(). */
-    const past = slotIsPast(i);
-    const cls = "plate" + (i===cur?" cur":"") + (done?" done":"") + (past?" past":"");
-    /* aria-disabled, not disabled: a past plate still has to take the tap so it can say
-       WHY nothing happened. A hard-disabled button swallows the tap silently, and
-       "I pressed it and the app ignored me" is indistinguishable from a bug. */
-    html += `<button class="${cls}" data-slot="${i}" style="background:${m.color}"${
-      past?' aria-disabled="true"':""}
-      aria-label="${m.name}, ${wd}${done?", done":past?", already passed this cycle":""}">${m.short}<small>${wd}</small>${
+    const cls = "plate" + (i===cur?" cur":"") + (done?" done":"");
+    html += `<button class="${cls}" data-slot="${i}" style="background:${m.color}"
+      aria-label="${m.name}, ${wd}${done?", done":""}">${m.short}<small>${wd}</small>${
       done?'<span class="pcheck">&#10003;</span>':""}</button>`;
   });
   html += "</div>";
   const left = restCreditsLeft();
   html += `<div class="cycle-row"><span class="num">${S.cycleDone.length} of ${ROTATION.length} done &middot; ${
-    left === REST_CREDITS ? REST_CREDITS+" rests available"
-    : left ? left+" rest left" : "both rests used"}</span><span>${
+    left === REST_CREDITS ? "rests book after each Legs day"
+    : left ? left+" rest still to book" : "both rests booked"}</span><span>${
     S.lastReview?'<button id="lastReviewBtn">last review</button> ':''}<button id="cycleReset">reset cycle</button></span></div>`;
   return html + "</div>";
 }
@@ -4624,8 +4644,9 @@ function viewToday(){
     h += `<div class="card" style="text-align:center;padding:34px 20px">
       <h3 style="font-size:26px">Rest day</h3>
       <div class="sub" style="margin-top:8px">Recovery is where the growth happens. Your rotation picks back up tomorrow with <b>${m.name}</b>.</div>
+      <div class="sub" style="margin-top:10px;font-size:12.5px;color:var(--faint)">Booked automatically after ${
+        esc(restEarnedBy(todayStr()) || "your last Legs day")}.</div>
     </div>`;
-    h += `<div class="btn-row"><button class="btn ghost" id="undoRestBtn">Actually, train today</button></div>`;
     return h;
   }
 
@@ -4634,8 +4655,8 @@ function viewToday(){
   if(restsTaken.length){
     h += `<div class="rest-note">Rest${restsTaken.length>1?"s":""} this cycle: <b>${
       restsTaken.map(d=>fmtDate(d)).join("</b>, <b>")}</b> &middot; ${
-      restCreditsLeft() ? restCreditsLeft()+" still available"
-      : `<button id="clearRestBtn" class="linklike">free one up</button>`}</div>`;
+      restCreditsLeft() ? "the next books itself after Legs"
+      : "both booked"}</div>`;
   }
 
   h += `<div class="card">
@@ -4643,7 +4664,7 @@ function viewToday(){
       <span class="dot" style="background:${m.color};width:17px;height:17px"></span>
       <h3 style="font-size:26px">${m.name} day</h3>
     </div>
-    <div class="sub">Next up in your rotation. The schedule only runs forwards, so you can skip ahead to a day you haven't done yet, but not back onto one the cycle has already spent.</div>
+    <div class="sub">Next up in your rotation. Tap a plate above to move your week, or pick a different workout below.</div>
   </div>`;
   h += deloadBannerHTML();
   h += sleepWindowHTML(wid);
@@ -4666,9 +4687,7 @@ function viewToday(){
     const ins = insight(e.name, occ);
     h += `<div class="ex-head"><b>${esc(e.name)}${supersetBadge(supersetInfo(rp.map(x=>x.chosen), rpi))}${other?'<span class="alt-badge">⇄</span>':''}</b><span class="ex-target">${e.sets}×${esc(e.reps)}${e.rpe?' · <span class="rpe-help" title="Tap for what RPE means">'+esc(rpeTxt(e.rpe))+'</span>':""}</span></div>`;
     h += supersetNoteHTML(supersetInfo(rp.map(x=>x.chosen), rpi));
-    if(warmupKindFor(rp.map(x=>x.chosen), rpi))
-      h += warmupHTML(e, warmupKindFor(rp.map(x=>x.chosen), rpi),
-                      {workoutId: wid, anyDay: isFinisher || sharedAcrossDays(e.name), occ});
+    if(warmupKindFor(rp.map(x=>x.chosen), rpi)) h += warmupHTML(e, warmupKindFor(rp.map(x=>x.chosen), rpi));
     if(ll) h += ll;
     if(needsCalibration(e)) h += calibrateHTML(e);
     h += inlineTipHTML(tips[nrm(e.name)], tipsSeen);
@@ -4759,7 +4778,7 @@ function viewActiveSession(){
         </span>
       </div>`;
     h += supersetNoteHTML(supersetInfo(a.entries, ei));
-    if(en.warm) h += warmupHTML(en, en.warm, {workoutId: a.workoutId, anyDay, occ});
+    if(en.warm) h += warmupHTML(en, en.warm);
     if(ll) h += ll;
     h += inlineTipHTML(tips[nrm(en.name)], tipsSeen);
     if(en.note) h += `<div class="ex-note">${esc(en.note)}</div>`;
@@ -4944,7 +4963,7 @@ function viewFocusSession(){
     </div>
     <div class="ex-target" style="margin:2px 0 10px">${en.sets.length}×${esc(en.reps||"")}${en.rpe?' · <span class="rpe-help" title="Tap for what RPE means">'+esc(rpeTxt(en.rpe))+'</span>':""}</div>`;
   h += supersetNoteHTML(supersetInfo(a.entries, ei));
-  if(en.warm) h += warmupHTML(en, en.warm, {workoutId: a.workoutId, anyDay, occ});
+  if(en.warm) h += warmupHTML(en, en.warm);
   if(ll) h += ll;
   h += inlineTipHTML(focusTipsFor(a.workoutId)[nrm(en.name)]);
   if(en.note) h += `<div class="ex-note">${esc(en.note)}</div>`;
@@ -6156,16 +6175,7 @@ function bind(){
     p.onclick = ()=>{
       if(S.active){ toast("Finish or discard the current workout first"); return; }
       const slot = parseInt(p.dataset.slot,10);
-      if(isNaN(slot)) return;
-      // The rotation is fixed and only runs forwards, so a spent slot is not selectable.
-      // See slotIsPast(): re-running a day you've done is how the day at the far end of
-      // the cycle stops getting trained.
-      if(slotIsPast(slot)){
-        toast(S.cycleDone.includes(slot)
-          ? "Already done this cycle. The rotation only moves forward"
-          : "That day has passed. The rotation only moves forward");
-        return;
-      }
+      if(S.cycleDone.includes(slot)) toast("Heads up, you've already done this one this cycle");
       S.pointer = slot;
       S.override = null;
       save(); queueSync(); render();
@@ -6188,41 +6198,12 @@ function bind(){
     const taken = restDaysThisCycle();
     const date = taken[slot] || null;
     const today = todayStr();
-    if(date === today){
-      if(confirm("Cancel today's rest day? The credit goes back.")){
-        releaseRestDay(today, true);
-        save(); queueSync(); render();
-      }
-      return;
-    }
-    if(date){ toast("That rest was "+fmtDate(date)+". Tap an empty plate to take another."); return; }
-    if(isRestToday()){ toast("Today is already logged as a rest day"); return; }
-    if(!restCreditsLeft()){ toast("Both rest days are used this cycle"); return; }
-    if(confirm("Take today as a rest day? You get "+REST_CREDITS+" per cycle, and this would be "
-               +(taken.length+1)+" of "+REST_CREDITS+".")){
-      takeRestDay(today);
-      save(); queueSync(); render();
-    }
+    /* Rest days are part of the programme's shape now, so the plate reports rather than
+       acts. Leaving it tappable-but-inert would read as broken, hence an explanation. */
+    if(date === today) toast("Today is your rest day, booked after " + (restEarnedBy(date) || "your last Legs day"));
+    else if(date)      toast("Rest booked for " + fmtDate(date) + ", the day after " + (restEarnedBy(date) || "Legs"));
+    else               toast("Rest days book themselves the day after Legs A and Legs B");
   });
-  const ur = $("#undoRestBtn");
-  if(ur) ur.onclick = ()=>{
-    // decided to train after all, so this was never a rest day: unlog it entirely
-    releaseRestDay(todayStr(), true);
-    save(); queueSync(); render();
-  };
-  const crb = $("#clearRestBtn");
-  if(crb) crb.onclick = ()=>{
-    // frees a credit but keeps the day in the permanent rest log: you did rest that
-    // day, you are only saying it should not count against this cycle's allowance
-    const taken = restDaysThisCycle();
-    if(!taken.length) return;
-    const d = taken[taken.length-1];
-    if(confirm("Free up the rest credit from "+fmtDate(d)+" so you can take another? "
-               +"The day stays in your rest history; remove it in Settings if it was a mistake.")){
-      releaseRestDay(d, false);
-      save(); queueSync(); render();
-    }
-  };
 
   // "See the full breakdown" on the Since-last-time card
   document.querySelectorAll("[data-fullgrade]").forEach(b=> b.onclick=()=>{
@@ -6247,6 +6228,8 @@ function bind(){
   const start = $("#startBtn");
   if(start) start.onclick = ()=> startWorkout(todaysWorkoutId());
 
+  const swap = $("#swapBtn");
+  if(swap) swap.onclick = openPicker;
   const goR = $("#goRestore");
   if(goR) goR.onclick = ()=>{
     TAB = "sync";
@@ -6320,15 +6303,17 @@ function bind(){
         // PR spark, compared against your ALL-TIME best for this exercise, and now
         // recorded on the set so it also shows as a badge and in the session summary.
         checkPR(ei, si, el);
-        /* The ✓ starts the stopwatch, except in two cases: inside a superset, where
-           there is deliberately no rest, and on the very last set of the very last
-           exercise, where there is nothing left to rest FOR. Timing the walk to the
-           car was never useful and it polluted the rest-discipline grade. */
-        const lastEntry = ei === S.active.entries.length - 1;
-        const lastSet = si === entry.sets.length - 1;
-        // endsRound() is the superset-aware version of "is there anything left to rest
-        // for": inside a pair only the movement that closes the round starts the clock.
-        if(endsRound(S.active.entries, ei, si) && !(lastEntry && lastSet)) startRest(ei, si);
+        /* The ✓ starts the stopwatch, except in two cases: mid-round inside a superset,
+           where there is deliberately no rest, and on the final set PERFORMED in the
+           session, where there is nothing left to rest FOR. Timing the walk to the car
+           was never useful and it polluted the rest-discipline grade.
+
+           Both tests are sequence-aware. endsRound() decides whether this set closes a
+           round; isFinalSetOfSession() walks the real interleaved order rather than
+           assuming the session ends on the last entry's last set, which is false for
+           any pair whose first movement carries more sets than its partner. */
+        if(endsRound(S.active.entries, ei, si) && !isFinalSetOfSession(S.active.entries, ei, si))
+          startRest(ei, si);
       } else {
         // unchecking: cancel its running timer and clear its recorded rest
         const rt = S.active.restTimer;
@@ -6729,6 +6714,8 @@ function finishWorkout(){
   // shows the same number later even as the surrounding history grows
   sessObj.quality = scoreWorkout(sessObj);
   const cycleFinished = recomputeCycle(true);
+  // after the rollover, so the rest Legs B earns lands in the cycle it will be taken in
+  const booked = bookRestAfter(wid, sessObj.date);
   S.override = null;
   save(); render();
   // celebration → quality score → cycle wrapped, each waiting for the last
@@ -6745,6 +6732,7 @@ function finishWorkout(){
     _celeStarted = true;
     celebrate(cycleFinished ? "cycle" : "workout", wid, Math.round(vol),
               ()=> setTimeout(()=>openScoreCard(sessObj, afterScore), 300));
+    if(booked) setTimeout(()=>toast("Rest day booked for " + fmtDate(booked)), 3400);
   };
   /* Two frames is what lets the layout settle. But requestAnimationFrame does not fire
      at all in a backgrounded tab, and finishing a workout is exactly when a phone gets
@@ -6773,13 +6761,6 @@ function recomputeCycle(announce){
     S.cycleStart = Date.now();
     S.cycleDone = [];
     S.restDays = [];
-    /* Back to the top of the rotation. The pointer used to be left wherever the last
-       session put it, so the cycle that had just closed on Legs B opened the new one on
-       Legs B again — the rotation's own wrap-around was the one place it did not run in
-       order. It matters more now that the strip refuses to move backwards: leaving the
-       pointer at the end would have opened a fresh cycle with everything before it
-       already looking spent. */
-    S.pointer = 0;
     if(announce) toast("Cycle complete, starting a fresh one 🔁");
     save();   // real transition, mark as a change worth syncing
     return true;
@@ -6796,12 +6777,19 @@ function recomputeCycle(announce){
   saveQuiet();   // derived recomputation, don't claim a newer change on every boot
   return false;
 }
-/* The free-choice workout picker used to live here, behind a "#swapBtn" that no view
-   has rendered for some time. It is gone rather than merely unbound: a modal listing
-   all six days with no notion of where you are in the cycle is exactly the escape hatch
-   that turns a set schedule into a menu, and it would have re-opened the same hole
-   slotIsPast() was added to close. `S.override` is still read by todaysWorkoutId() so
-   any value already sitting in an older save keeps working for the day it was set. */
+function openPicker(){
+  let h = `<h3>Pick today's workout</h3><div class="picker">`;
+  DAYS.forEach(id=>{
+    const m = dayMeta(id);
+    h += `<button data-pick="${id}"><span class="dot" style="background:${m.color}"></span>${m.name}</button>`;
+  });
+  h += `</div><button class="btn ghost" style="margin-top:14px" id="closeModal">Cancel</button>`;
+  showModal(h);
+  document.querySelectorAll("[data-pick]").forEach(b=> b.onclick=()=>{
+    S.override = {date: todayStr(), workoutId: b.dataset.pick};
+    save(); hideModal(); render();
+  });
+}
 
 /* =====================================================================
    PROGRAMME CHANGE LOG
@@ -6882,17 +6870,41 @@ function prescriptionMoved(changes){
     c.kind === "add" || c.kind === "remove" ||
     (c.changes||[]).some(d=>PLAN_PRESCRIPTION_FIELDS[d.key]));
 }
+/* Two shapes go into `changes` and both have to come out readable.
+
+   The programme editor logs planDiff() objects, {field, from, to}. Everything else —
+   a double-progression bump, a calibration, a deload, the asymmetry re-test — logs
+   plain sentences it has already written. Rendering the second kind through the first
+   kind's template produced "Changed X on Workout day: blank → blank.", because a string
+   has no .field, .from or .to and `null` day fell through to dayMeta()'s placeholder.
+
+   So: strings pass through, objects get formatted, and the day clause only appears when
+   the change actually belongs to a day. */
+function planChangeBit(d){
+  if(typeof d === "string") return esc(d);
+  if(!d || typeof d !== "object") return "";
+  const shown = v => (v === null || v === undefined || v === "") ? "nothing" : esc(String(v));
+  const label = d.field ? esc(d.field)+" " : "";
+  return label + shown(d.from) + " → " + shown(d.to);
+}
 function planChangeSentence(c){
-  const day = c.day === "finisher" ? "the finisher" : widName(c.day)+" day";
-  if(c.kind === "add")    return "Added <b>"+esc(c.name)+"</b> to "+esc(day)+
+  // `day` is null on programme-wide entries, which are not about one day at all
+  const onDay = (c.day == null) ? "" :
+    (c.day === "finisher" ? " in the finisher" : " on "+esc(widName(c.day))+" day");
+  const bits = (c.changes||[]).map(planChangeBit).filter(Boolean);
+  const tail = bits.length ? ": "+bits.join("; ") : "";
+
+  if(c.kind === "add")    return "Added <b>"+esc(c.name)+"</b> to"+(onDay||" the programme")+
     (c.spec ? " ("+esc(c.spec)+")" : "")+".";
-  if(c.kind === "remove") return "Removed <b>"+esc(c.name)+"</b> from "+esc(day)+
+  if(c.kind === "remove") return "Removed <b>"+esc(c.name)+"</b> from"+(onDay||" the programme")+
     ". Sessions already logged keep it.";
   if(c.kind === "move")   return "Moved <b>"+esc(c.name)+"</b> "+(c.dir<0?"earlier":"later")+
-    " in "+esc(day)+", to position "+c.pos+" of "+c.of+".";
-  const bits = (c.changes||[]).map(d=>
-    esc(d.field)+" "+(d.from ? esc(d.from) : "blank")+" → "+(d.to ? esc(d.to) : "blank"));
-  return "Changed <b>"+esc(c.prevName || c.name)+"</b> on "+esc(day)+": "+bits.join("; ")+".";
+    onDay+", to position "+c.pos+" of "+c.of+".";
+  if(c.kind === "weight") return "<b>"+esc(c.name)+"</b>"+onDay+", load "+
+    (bits.length ? bits.join("; ") : "changed")+".";
+  if(c.kind === "deload" || c.kind === "rule" || c.kind === "programme")
+    return "<b>"+esc(c.name)+"</b>"+tail+".";
+  return "Changed <b>"+esc(c.prevName || c.name)+"</b>"+onDay+tail+".";
 }
 
 /* ---------- program editor ---------- */
@@ -7849,17 +7861,8 @@ function openScoreCard(sess, onDone){
   let fired = false;
   MODAL_DISMISS = ()=>{ if(fired) return; fired = true; if(onDone) onDone(); };
   MODAL_REOPEN = ()=> openScoreCard(sess, onDone);
-  /* Marking it on the SESSION, not just on the button, is what stops the whole "Add
-     weight next time" block coming back with live buttons the next time this grade is
-     opened from History. See progressionApplied(). */
-  const markApplied = name=>{
-    const k = nrm(name);
-    (sess.progression || []).forEach(p=>{ if(p.kind === "up" && nrm(p.name) === k) p.applied = true; });
-    save(); queueSync();
-  };
   document.querySelectorAll("#modal [data-progapply]").forEach(btn=> btn.onclick = ()=>{
     if(applyProgression(btn.dataset.progapply, btn.dataset.progto)){
-      markApplied(btn.dataset.progapply);
       btn.textContent = "Applied";
       btn.disabled = true;
       btn.classList.add("done");
@@ -7868,10 +7871,9 @@ function openScoreCard(sess, onDone){
   const all = $("#progApplyAll");
   if(all) all.onclick = ()=>{
     let n = 0;
-    (sess.progression || []).filter(p=>p.kind === "up" && !progressionApplied(p)).forEach(p=>{
-      if(applyProgression(p.name, p.to)){ p.applied = true; n++; }
+    (sess.progression || []).filter(p=>p.kind === "up").forEach(p=>{
+      if(applyProgression(p.name, p.to)) n++;
     });
-    if(n){ save(); queueSync(); }
     toast(n ? n + " load" + (n === 1 ? "" : "s") + " updated in your programme" : "Nothing to apply");
     openScoreCard(sess, onDone);
   };
@@ -8095,36 +8097,9 @@ function buildProgression(sess){
   });
   return out;
 }
-/* Has this load increase already been written into the programme?
-
-   The score card is stored on the session and re-read from History whenever you look at
-   an old grade, so "Add weight next time, 3" with three live Apply buttons kept coming
-   back weeks after all three had been applied — and tapping one again would stack a
-   second increase on a load that had already moved. Two ways to know it's done:
-
-     • the flag written at the moment you applied it, which is the reliable one; and
-     • the programme's load standing at EXACTLY the figure this card suggested, which
-       catches cards applied before that flag existed, with no migration.
-
-   The second test is deliberately an exact match rather than "the load is at or past
-   it". A >= test reads as "applied" for any load that merely sits above the suggestion
-   for unrelated reasons — and the Smith entries are exactly that case, since the
-   programme records them bar-inclusive (115) while the sets you log do not (40), so
-   >= would have silently swallowed every Smith increase this card ever offered. An
-   exact match can only be produced by applyProgression() having written it. */
-function progressionApplied(p){
-  if(!p || p.kind !== "up") return false;
-  if(p.applied) return true;
-  if(p.to == null) return false;
-  const e = findProgramEntry(p.name);
-  if(!e || e.weight == null) return false;
-  const now = parseFloat(e.weight), to = parseFloat(p.to);
-  return !isNaN(now) && !isNaN(to) && now === to;
-}
 function progressionHTML(list){
   if(!list || !list.length) return "";
-  const done = list.filter(p=>p.kind === "up" && progressionApplied(p));
-  const ups = list.filter(p=>p.kind === "up" && !progressionApplied(p));
+  const ups = list.filter(p=>p.kind === "up");
   const hard = list.filter(p=>p.kind === "toohard");
   const stalls = list.filter(p=>p.stall);
   let h = "";
@@ -8153,16 +8128,6 @@ function progressionHTML(list){
       </div>`;
     });
     h += `<button class="more-btn" id="progApplyAll">Apply all ${ups.length} to the programme</button>`;
-  }
-  /* Applied increases drop out of the actionable list but not off the card: reopening a
-     grade should still tell you what changed that day, just without a button offering to
-     do it a second time. */
-  if(done.length){
-    h += `<div class="rev-head">Already added to your programme, ${done.length}</div>`;
-    done.forEach(p=>{
-      h += `<div class="rev-line"><b>${esc(p.name)}</b><span class="num" style="font-size:12.5px">${
-        p.to == null ? "applied" : "now " + esc(fmtLoad(p.to))} ✓</span></div>`;
-    });
   }
   if(stalls.length){
     h += `<div class="rev-head">Stalled</div>`;
@@ -8510,10 +8475,16 @@ function ruleBannerHTML(){
 
    The original diagnosis was never "days aren't pinned to the calendar" — it was that
    muscle groups were going 8 to 11 days between sessions. That is the thing worth
-   catching. With six days plus one rest day, a normal week has every muscle back
-   inside 3-4 days, so 5+ means you have genuinely slipped rather than merely shuffled.
+   catching.
+
+   The threshold moved from 5 to 7 when the second rest day landed. On the eight-day
+   cycle every muscle comes round in exactly four days: chest on Push A then Push B,
+   back on Pull A then Pull B, legs on Legs A then Legs B, and the same four wrapping
+   into the next cycle. Five therefore left one day of slack, so a single missed day
+   raised a red card and the flag stopped meaning anything. Seven fires when two or
+   three days are genuinely gone, which is the case it was built for.
    ===================================================================== */
-const DRIFT_DAYS = 5;
+const DRIFT_DAYS = 7;
 function driftReport(){
   const now = Date.now();
   const last = {};
@@ -8546,8 +8517,8 @@ function driftHTML(){
     <div class="fc-k" style="color:var(--bad)">Drifting</div>
     <div class="fc-do">${top.map(x=>esc(gName(x.m)) + " " + x.days + " days").join(" · ")}${
       stale.length > 4 ? " and " + (stale.length - 4) + " more" : ""}</div>
-    <div class="fc-sub">On a six-day rotation every muscle should come round inside 3 to 4 days.
-      Anything past ${DRIFT_DAYS} means the rotation has slipped, not just shifted.</div>
+    <div class="fc-sub">On this cycle every muscle should come round inside four days.
+      Past ${DRIFT_DAYS} means days have genuinely been lost, not just shuffled.</div>
   </div>`;
 }
 
@@ -8617,83 +8588,9 @@ function sleepWindowHTML(wid){
 
    A ramp is expressed in percentages so it stays correct when the load moves. The last
    rung sits at 90% for 2-3 reps: close enough to feel the working weight, far enough
-   from it to cost nothing.
-
-   WHICH NUMBER THE PERCENTAGE IS TAKEN OF, which is where this used to be wrong.
-
-   The ramp was always computed from the PRESCRIBED load on the programme card, and for
-   the Smith work that number is recorded bar-inclusive: 115 means "25 lb bar + 45 a
-   side". The weights actually typed into the set rows are not — they are the load the
-   way this log has always written it, with the bar left out. So the warm-up quoted
-   "45 lb → 75 lb → 105 lb" above sets being logged at 40, and the only way to read that
-   was that the warm-up had the bar in it and the working sets did not. It did.
-
-   So the ramp is taken from YOUR OWN LOGGED NUMBERS instead — see warmWorkingLoad() for
-   the three sources and why they rank the way they do. The short version: what you are
-   about to lift if the last grade said to add weight, otherwise what you actually lifted
-   last time, and only with no history at all the prescribed load, bar removed.
-
-   Reading the log rather than the card fixes more than the units. Whatever convention a
-   given movement happens to be recorded in, the warm-up is quoted in that same one, and
-   a load you have already moved past stops warming you up for the wrong weight.       */
+   from it to cost nothing.                                                          */
 const WARM_FULL = [{pct:0.40, reps:"8"}, {pct:0.65, reps:"5"}, {pct:0.90, reps:"3"}];
 const WARM_LIGHT = [{pct:0.55, reps:"5"}];
-
-/* The Smith machine's carriage. The programme's Smith loads include it (see the note on
-   defaultProgram); nothing that gets typed into a set row does. */
-const SMITH_BAR = 25;
-function barWeightFor(name){
-  return /\bsmith\b/.test(nrm(name)) ? SMITH_BAR : 0;
-}
-/* The load the ramp is a percentage OF, and where the number came from. `ctx` is how the
-   caller says which exercise slot this is, and matches the arguments the "last time" box
-   next to it is already built from.
-
-   Three sources, in order, and the order is the whole point:
-
-     next  the load you are about to lift. When the last session's grade ended in "add
-           weight next time: 40 → 50", 50 is what today's sets are for, so 50 is what the
-           ramp aims at. Warming up to 90% of 40 on the session you step up puts the top
-           warm-up rung UNDER your opening working set, which is not a warm-up.
-     last  otherwise, the heaviest working set you actually did last time.
-     plan  and only with no history at all, the prescribed load with the bar removed.
-
-   The verdict is read from the most recent session containing the movement, so it is
-   always the current recommendation — train again and that session brings its own. It is
-   honoured whether or not you tapped Apply: the suggestion is the app's read on that
-   exact session either way, and a warm-up rung 10 lb high costs less than one 10 lb low. */
-function warmWorkingLoad(e, ctx){
-  if(ctx && ctx.workoutId && e && e.name){
-    const l = lastEntryFor(ctx.workoutId, e.name, !!ctx.anyDay, ctx.occ || 0);
-    if(l){
-      const up = progressionUpFor(l.sess, e.name, ctx.occ || 0);
-      if(up != null) return {w: up, src: "next"};
-      let top = 0;
-      (l.sets || []).forEach(st=>{
-        if(!st || st.reps === "" || st.reps == null) return;
-        const w = parseFloat(st.weight);
-        if(w > top) top = w;
-      });
-      if(top > 0) return {w: top, src: "last"};
-    }
-  }
-  // programme entries carry `weight`; live session entries carry `planWeight`
-  const w = parseFloat(e && (e.weight != null ? e.weight : e.planWeight));
-  if(!(w > 0)) return null;
-  const bare = w - barWeightFor(e.name);
-  return bare > 0 ? {w: bare, src: "plan"} : null;
-}
-/* The load a session's grade told you to move to for this movement, if it told you
-   anything. Occurrence-aware for the same reason every other lookup is: the finisher
-   runs crunch → leg raise → crunch, and the 2nd crunch's verdict is not the 1st's. */
-function progressionUpFor(sess, name, occ){
-  if(!sess || !Array.isArray(sess.progression)) return null;
-  const k = nrm(name);
-  const hits = sess.progression.filter(p=>p.kind === "up" && nrm(p.name) === k);
-  if(!hits.length) return null;
-  const to = parseFloat(hits[Math.min(occ || 0, hits.length - 1)].to);
-  return to > 0 ? to : null;
-}
 
 // Round to something you can actually load: dumbbells move in 2.5s, plates in 5s.
 function warmRound(w, name){
@@ -8711,22 +8608,21 @@ function warmupKindFor(list, index){
   if(compounds.length > 1 && compounds[1] === index) return "light";
   return null;
 }
-function warmupPlan(e, kind, ctx){
+function warmupPlan(e, kind){
   if(!kind) return [];
   const spec = kind === "full" ? WARM_FULL : WARM_LIGHT;
-  const src = warmWorkingLoad(e, ctx);
-  const w = src && src.w;
+  // programme entries carry `weight`; live session entries carry `planWeight`
+  const w = parseFloat(e && (e.weight != null ? e.weight : e.planWeight));
   if(!(w > 0)){
     // bodyweight: there is no percentage to take, so ramp on reps instead
     return kind === "full"
       ? [{label:"bodyweight", reps:"8"}, {label:"bodyweight", reps:"5"}]
       : [{label:"bodyweight", reps:"5"}];
   }
-  return spec.map(x=>({label: warmRound(w * x.pct, e.name) + " lb", reps: x.reps,
-                       pct: Math.round(x.pct*100), src: src.src}));
+  return spec.map(x=>({label: warmRound(w * x.pct, e.name) + " lb", reps: x.reps, pct: Math.round(x.pct*100)}));
 }
-function warmupHTML(e, kind, ctx){
-  const plan = warmupPlan(e, kind, ctx);
+function warmupHTML(e, kind){
+  const plan = warmupPlan(e, kind);
   if(!plan.length) return "";
   return `<div class="warm">
     <span class="warm-tag">Warm-up</span>
@@ -8736,12 +8632,8 @@ function warmupHTML(e, kind, ctx){
       plan[0] && plan[0].pct == null
         ? (kind === "full" ? "easy reps to warm the joint, no added load. Not counted."
                            : "one easy set. Not counted.")
-        /* Saying WHICH load it is aiming at matters on the session you step up: the
-           numbers jump, and "your new load" is the difference between that reading as
-           the plan working and reading as the app having lost track of your weights. */
-        : (kind === "full"
-            ? "ramping to about 90% of your " + (plan[0].src === "next" ? "new" : "working") + " load. Not counted."
-            : "one light set" + (plan[0].src === "next" ? ", off your new load" : "") + ". Not counted.")}</span>
+        : (kind === "full" ? "ramping to about 90% of your working load. Not counted."
+                           : "one light set. Not counted.")}</span>
   </div>`;
 }
 
@@ -9044,6 +8936,38 @@ function endsRound(entries, ei, si){
   const partner = entries[ei + 1];
   return !(partner && partner.sets && partner.sets[si]);
 }
+
+/* The order sets are actually PERFORMED in, which is not the order they are stored in.
+   A superset interleaves: A1 B1 A2 B2 A3, so the last set of the session can belong to
+   the first movement of a pair rather than to the last exercise in the list.
+
+   Legs A is exactly that case, and testing "last exercise AND its last set" got it wrong
+   at both ends: the rest after round 2 was suppressed (ab crunch's final set looked like
+   the end of the session) and a rest fired after round 3 (the calf raise that really did
+   end it was not the last entry). Ask the sequence instead of guessing from indices. */
+function execOrder(entries){
+  const out = [];
+  for(let i = 0; i < entries.length; i++){
+    const info = supersetInfo(entries, i);
+    if(info && info.role === "second") continue;          // already emitted with its partner
+    const partner = (info && info.role === "first") ? entries[i+1] : null;
+    if(partner){
+      const rounds = Math.max(entries[i].sets.length, partner.sets.length);
+      for(let r = 0; r < rounds; r++){
+        if(entries[i].sets[r]) out.push({ei:i,   si:r});
+        if(partner.sets[r])    out.push({ei:i+1, si:r});
+      }
+      i++;                                                 // partner consumed
+      continue;
+    }
+    entries[i].sets.forEach((_, s)=> out.push({ei:i, si:s}));
+  }
+  return out;
+}
+function isFinalSetOfSession(entries, ei, si){
+  const o = execOrder(entries), last = o[o.length - 1];
+  return !!last && last.ei === ei && last.si === si;
+}
 function supersetRounds(a, i){
   const A = a.entries[i], B = a.entries[i+1];
   return Math.max(A ? A.sets.length : 0, B ? B.sets.length : 0);
@@ -9059,8 +8983,7 @@ function supersetGroupHTML(a, i, tips, tipsSeen){
     const anyDay = p.en.fin || sharedAcrossDays(p.en.name);
     return {
       last: lastSetsFor(a.workoutId, p.en.name, anyDay, occ),
-      box:  lastBox(a.workoutId, p.en.name, anyDay, occ),
-      ctx:  {workoutId: a.workoutId, anyDay, occ}
+      box:  lastBox(a.workoutId, p.en.name, anyDay, occ)
     };
   });
 
@@ -9083,7 +9006,7 @@ function supersetGroupHTML(a, i, tips, tipsSeen){
         </span>
       </div>
       ${p.en.note?`<div class="ex-note">${esc(p.en.note)}</div>`:""}
-      ${p.en.warm ? warmupHTML(p.en, p.en.warm, meta[k].ctx) : ""}
+      ${p.en.warm ? warmupHTML(p.en, p.en.warm) : ""}
       ${meta[k].box || ""}
       ${inlineTipHTML(tips[nrm(p.en.name)], tipsSeen)}
       ${p.en.startSide ? altHintHTML(p.en.altStyle||"side", p.en.startSide, p.en.sets.length) : ""}
@@ -9450,7 +9373,7 @@ async function gistFetch(path, opts={}){
   return res.json();
 }
 function payload(){
-  return JSON.stringify({program:S.program, pointer:S.pointer, cycleStart:S.cycleStart, cycleDone:S.cycleDone, restDays:S.restDays||[], restLog:S.restLog||[], restDeleted:S.restDeleted||[], lastCycle:S.lastCycle||null, lastReview:S.lastReview||null, checkins:S.checkins||{}, exAliases:S.exAliases||{}, stalls:S.stalls||{}, deload:S.deload||null,
+  return JSON.stringify({program:S.program, pointer:S.pointer, cycleStart:S.cycleStart, cycleDone:S.cycleDone, restDays:S.restDays||[], restLog:S.restLog||[], restDeleted:S.restDeleted||[], restAuto:S.restAuto||[], lastCycle:S.lastCycle||null, lastReview:S.lastReview||null, checkins:S.checkins||{}, exAliases:S.exAliases||{}, stalls:S.stalls||{}, deload:S.deload||null,
     blockStart:S.blockStart||null, planStart:S.planStart||null, wakeTime:S.wakeTime||null, sleepTarget:S.sleepTarget||null,
     asymRetired:S.asymRetired||{}, asymRetest:S.asymRetest||null,
     volWindow:S.volWindow||"cycle", askWhy:S.askWhy!==false, deleted:(S.deleted||[]).slice(-500), planLog:(S.planLog||[]).slice(-500), sessions:S.sessions, savedAt:S.savedAt}, null, 1);
@@ -9750,12 +9673,16 @@ function planExerciseRow(e, wid, opts){
   opts = opts || {};
   const asty = altStyle(e);
   const bits = [];
+  // the pairing is part of the prescription, so it belongs on the printed card too
+  if(opts.ss === "first")  bits.push("SUPERSET: straight into " + (opts.ssPartner||"the next movement") + ", no rest between");
+  if(opts.ss === "second") bits.push("SUPERSET: performed immediately after " + (opts.ssPartner||"the previous movement") + "; rest comes after this one");
   if(asty === "side")  bits.push("one limb at a time, alternating L/R each set");
   if(asty === "cross") bits.push("both arms, alternating which crosses on top");
   if(e.note) bits.push(e.note);
   const load = (e.weight != null && e.weight !== "") ? e.weight + " lb" : "bodyweight";
   return `<tr>
-    <td><b>${esc(e.name)}</b>${opts.altOf ? `<br><span class="sm">alternates with ${esc(opts.altOf)}</span>` : ""}</td>
+    <td><b>${esc(e.name)}</b>${opts.altOf ? `<br><span class="sm">alternates with ${esc(opts.altOf)}</span>` : ""}${
+      opts.ss ? `<br><span class="sm">superset ${opts.ss==="first"?"1 of 2":"2 of 2"}</span>` : ""}</td>
     <td class="c">${esc(String(e.sets))}</td>
     <td class="c">${esc(e.reps || "—")}</td>
     <td class="c">${e.rpe ? esc(String(e.rpe)) : "—"}</td>
@@ -9871,8 +9798,9 @@ function buildPlanInner(){
       <table>
         <thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>RPE</th><th>Start load</th><th>Notes</th></tr></thead>
         <tbody>`;
-    list.forEach(e=>{
-      body += planExerciseRow(e, wid);
+    list.forEach((e, i)=>{
+      const _ssi = supersetInfo(list, i);
+      body += planExerciseRow(e, wid, _ssi ? {ss:_ssi.role, ssPartner:_ssi.partner} : undefined);
       if(e.alt){
         const upNext = activeVariant(wid, e) === e ? e.name : e.alt.name;
         body += planExerciseRow(e.alt, wid, {altOf: e.name});
@@ -10040,19 +9968,32 @@ function buildReportInner(){
     body += `<h2>${longDate(s.date)}, ${m.name} Day</h2>
     ${metaBits.length?`<p class="meta">${metaBits.join(" · ")}</p>`:""}
     <table><thead><tr><th>Exercise</th><th>Set</th><th>Side</th><th>Weight (lb)</th><th>Reps</th><th>RPE</th><th>Rest</th></tr></thead><tbody>`;
-    s.entries.forEach(e=>{
+    s.entries.forEach((e, ei)=>{
       // keep the original index so the L/R attribution stays correct after filtering
       const sets = e.sets.map((st,i)=>({st,i})).filter(x=>x.st.reps||x.st.weight);
       if(!sets.length) return;
+      /* A superset read as two ordinary exercises stacked on top of each other, which is
+         the one thing the table must not imply: it was performed round by round, and the
+         Set column is the round number. The pair gets a band above it saying so, and each
+         half is tagged, so neither survives being read in isolation. */
+      const ssi = supersetInfo(s.entries, ei);
+      if(ssi && ssi.role === "first" && ssi.partner){
+        const partner = s.entries[ei+1];
+        const rounds = Math.max(e.sets.length, partner ? partner.sets.length : 0);
+        body += `<tr class="ssband"><td colspan="7"><b>Superset</b> &middot; ${esc(e.name)} +
+          ${esc(ssi.partner)} &mdash; ${rounds} round${rounds===1?"":"s"}, one set of each back
+          to back with no rest between them. The Set column below is the round number.</td></tr>`;
+      }
+      const ssTag = ssi ? `<br><span class="sstag">superset ${ssi.role==="first"?"1 of 2":"2 of 2"}</span>` : "";
       sets.forEach(({st,i}, row)=>{
         const side = e.startSide ? sideForSet(e.startSide, i) : null;
-        body += `<tr>${row===0?`<td rowspan="${sets.length}"><b>${esc(e.name)}</b></td>`:""}
+        body += `<tr${ssi?' class="ssrow"':''}>${row===0?`<td rowspan="${sets.length}"><b>${esc(e.name)}</b>${ssTag}</td>`:""}
           <td class="c">${row+1}</td>
           <td class="c">${side ? esc((e.altStyle==="cross" ? side+" on top" : side)) : " "}</td>
           <td class="c">${st.weight!=null&&st.weight!==""?esc(st.weight):"bodyweight"}</td>
           <td class="c">${esc(st.reps||"")}</td>
           <td class="c">${esc(st.rpe||" ")}</td>
-          <td class="c">${st.rest?esc(fmtClock(st.rest)):" "}</td></tr>`;
+          <td class="c">${st.rest?esc(fmtClock(st.rest)):(ssi&&ssi.role==="first"?"<i>no rest</i>":" ")}</td></tr>`;
       });
     });
     body += `</tbody></table>`;
@@ -10089,6 +10030,9 @@ function buildReportHTML(){
     .planchg{border-left:3px solid #111;background:#f4f2ee;padding:9px 14px;margin:20px 0;font-size:11pt;page-break-inside:avoid}
     .planchg ul{margin:5px 0 0;padding-left:18px}
     .planchg li{margin:2px 0}
+    .ssband td{background:#ece8e0;border-top:2px solid #111;font-size:10pt;font-style:italic}
+    .ssrow td{background:#faf8f4}
+    .sstag{font-size:8.5pt;text-transform:uppercase;letter-spacing:.06em;color:#555;font-style:normal}
   </style></head><body>
   ${buildReportInner()}</body></html>`;
 }
