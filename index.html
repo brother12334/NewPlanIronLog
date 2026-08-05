@@ -3747,6 +3747,20 @@ function windowStats(from, to){
 /* Multi-joint lifts carry systemic fatigue that single-joint work does not, which is
    why a compound-heavy week lowers what you can recover from. */
 const COMPOUND_RE = /bench|press|row|pulldown|pull[- ]?up|chin|squat|deadlift|rdl|romanian|lunge|dip\b|thrust|leg press|hack|clean|snatch|shrug/i;
+/* Movements that genuinely START at bodyweight, as opposed to ones that merely have no
+   load recorded yet.
+
+   The app used to treat those as the same thing, because before v3.4 a missing weight
+   only ever happened on a pull-up or a dip. With the prescribed loads gone, an
+   uncalibrated Smith squat also has no number, and it was being told to warm up with
+   "bodyweight" reps and to add external load once it could do bodyweight sets. A Smith
+   bar is not bodyweight; it just has not been measured yet. */
+const BODYWEIGHT_RE = /pull[- ]?up|chin[- ]?up|\bdips?\b|push[- ]?up|hanging leg raise|knee raise|back extension|reverse hyper|sit[- ]?up|plank|nordic|inverted row|muscle[- ]?up|pistol/i;
+function isBodyweightMovement(name){ return BODYWEIGHT_RE.test(nrm(name)); }
+// what you would put on it for a warm-up set before you know the working load
+function emptyImplementLabel(name){
+  return /smith|barbell|\bbar\b/.test(nrm(name)) ? "empty bar" : "light";
+}
 const ISOLATION_RE = /fly|flye|raise|curl|extension|kickback|pushdown|press[- ]?down|crunch|calf|abduction|adduction|pullover|prayer/i;
 function isCompound(name){
   const k = nrm(name);
@@ -8151,8 +8165,11 @@ function progressionStep(e){
      back advised to add external load once it could do bodyweight reps. The question is
      really whether any load is known for it at all, from any source. */
   if(knownLoad(e) == null){
-    return {amount: 5, unit: "lb", bodyweight: true,
-            why: "nothing loaded logged yet: add external load once the top of the range clears on the first two sets"};
+    return isBodyweightMovement(e && e.name)
+      ? {amount: 5, unit: "lb", bodyweight: true,
+         why: "bodyweight movement: add external load once the top of the range clears on the first two sets"}
+      : {amount: 5, unit: "lb", uncalibrated: true,
+         why: "no load logged for this one yet, so the first working set sets the baseline"};
   }
   return {amount: 5, unit: "lb", why: "one pin on the stack"};
 }
@@ -8889,10 +8906,18 @@ function warmupPlan(e, kind){
                       : e.planWeight != null ? e.planWeight
                       : workingLoad(e.name)));
   if(!(w > 0)){
-    // bodyweight: there is no percentage to take, so ramp on reps instead
+    /* No load to take a percentage of. Two different reasons for that, and they want
+       different instructions: a pull-up really is bodyweight, whereas a Smith squat you
+       have not calibrated yet wants the empty bar and a feel for it. */
+    if(isBodyweightMovement(e && e.name)){
+      return kind === "full"
+        ? [{label:"bodyweight", reps:"8"}, {label:"bodyweight", reps:"5"}]
+        : [{label:"bodyweight", reps:"5"}];
+    }
+    const lab = emptyImplementLabel(e && e.name);
     return kind === "full"
-      ? [{label:"bodyweight", reps:"8"}, {label:"bodyweight", reps:"5"}]
-      : [{label:"bodyweight", reps:"5"}];
+      ? [{label:lab, reps:"8", uncal:true}, {label:lab, reps:"5", uncal:true}]
+      : [{label:lab, reps:"5", uncal:true}];
   }
   return spec.map(x=>({label: warmRound(w * x.pct, e.name) + " lb", reps: x.reps, pct: Math.round(x.pct*100)}));
 }
@@ -8904,7 +8929,9 @@ function warmupHTML(e, kind){
     <span class="warm-sets">${plan.map(x=>
       `<span class="warm-set">${esc(x.label)} <i>&times;${esc(x.reps)}</i></span>`).join("")}</span>
     <span class="warm-note">${
-      plan[0] && plan[0].pct == null
+      plan[0] && plan[0].uncal
+        ? "building up to your first working set, which sets the load from here on. Not counted."
+      : plan[0] && plan[0].pct == null
         ? (kind === "full" ? "easy reps to warm the joint, no added load. Not counted."
                            : "one easy set. Not counted.")
         : (kind === "full" ? "ramping to about 90% of your working load. Not counted."
