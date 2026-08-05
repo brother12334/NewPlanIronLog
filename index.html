@@ -723,6 +723,13 @@ body.cele-open{overflow:hidden}
   width:50px;height:50px;border-radius:50%;border:1px solid var(--line);
   background:var(--card2);color:var(--text);font-size:19px;cursor:pointer;z-index:1;
 }
+/* Past the four-minute ceiling. Red, and it stays red for the rest of that rest. */
+.rest-over .pf-plate,.rest-over .rest-dot{background:var(--bad)!important}
+.rest-over .rest-time{color:var(--bad)}
+.rest-full.rest-over .rest-time{color:#fff}
+.rest-over .pf-ring{border-color:var(--bad)}
+.rest-over .pf-hub:after{content:"over the cap";display:block;font-size:9px;letter-spacing:.08em;
+  text-transform:uppercase;color:#fff;opacity:.85;margin-top:2px}
 .rest-mini{
   position:fixed;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:150;
   display:flex;align-items:center;gap:4px;background:var(--card);border:1px solid var(--line);
@@ -1277,7 +1284,7 @@ body.cele-open{overflow:hidden}
 /* Bumped by 0.1 on every round of edits to this file. It is shown on the splash, in
    Setup, and on the printed programme, so a report you handed to someone last month can
    be matched against the build that produced it. */
-const APP_VERSION = "3.3";
+const APP_VERSION = "3.5";
 /* ================= DATA ================= */
 const LS_KEY = "ironlog.v1";
 const GIST_FILE = "ironlog-data.json";
@@ -1344,8 +1351,54 @@ function restDaysThisCycle(){
   return S.restDays;
 }
 function restCreditsLeft(){ return Math.max(0, REST_CREDITS - restDaysThisCycle().length); }
-function isRestDay(date){ return restDaysThisCycle().indexOf(date) > -1; }
+function isRestDay(date){
+  if(restDaysThisCycle().indexOf(date) > -1) return true;
+  return Array.isArray(S.restExtra) && S.restExtra.some(x=>x.date === date);
+}
 function isRestToday(){ return isRestDay(todayStr()); }
+
+/* UNSCHEDULED REST, v3.4.
+
+   The two rests after Legs A and Legs B are structural and book themselves. This is the
+   other kind: the day you are ill, wrecked, or short of sleep. v3.3 called the rest days
+   "not negotiable" and left no way to express it, which meant an unavoidable day off had
+   to be logged as a missed session — the programme scoring you down for doing the one
+   thing that was going to keep it on the rails.
+
+   Kept in its own list on purpose. An extra day never consumes a scheduled credit, never
+   moves the rotation, and never stops the next Legs day booking its own rest. The
+   structure is untouched; this only records that a day was rest rather than a no-show. */
+const REST_REASONS = [
+  {k:"ill",    label:"Ill"},
+  {k:"sleep",  label:"Short of sleep"},
+  {k:"wrecked",label:"Wrecked / still sore"},
+  {k:"life",   label:"Life got in the way"}
+];
+function extraRestDays(){
+  if(!Array.isArray(S.restExtra)) S.restExtra = [];
+  return S.restExtra;
+}
+function isExtraRest(date){ return extraRestDays().some(x=>x.date === date); }
+function extraRestFor(date){ return extraRestDays().find(x=>x.date === date) || null; }
+function takeExtraRest(date, reason){
+  if(isExtraRest(date) || isRestDay(date)) return false;
+  S.restDeleted = restTombstones().filter(d=>d !== date);
+  extraRestDays().push({date, reason: reason || "", at: Date.now()});
+  S.restExtra.sort((a,b)=> a.date < b.date ? -1 : 1);
+  if(!Array.isArray(S.restLog)) S.restLog = [];
+  if(!S.restLog.includes(date)){ S.restLog.push(date); S.restLog.sort(); }
+  const r = REST_REASONS.find(x=>x.k === reason);
+  logPlanChange("rest", null, "Unscheduled rest day",
+    [fmtDate(date) + (r ? ", " + r.label.toLowerCase() : "")],
+    {note:"Taken on top of the two scheduled rests. Does not affect the rotation."});
+  return true;
+}
+function releaseExtraRest(date){
+  S.restExtra = extraRestDays().filter(x=>x.date !== date);
+  S.restLog = (S.restLog||[]).filter(d=>d !== date);
+  const t = restTombstones();
+  if(t.indexOf(date) < 0) t.push(date);
+}
 /* Giving a credit back. `alsoUnlog` separates "I did not actually rest that day",
    which should leave no trace, from "free the credit but I did rest", which keeps the
    day in the permanent log.
@@ -1985,112 +2038,136 @@ const REST_SQUAT  = [180, 300];   // 3-4 min, the one movement that genuinely ne
 const REST_SECOND = [120, 180];   // 2-3 min, secondary compounds
 const REST_ISO    = [90, 150];    // 90 s minimum, isolation
 
+/* A HARD CEILING ON REST, v3.4.
+
+   The bands above are targets; this is a limit. On 4 August a single leg curl rest ran
+   17:51 and a leg extension 8:47, and session density came out at 9.8 working sets an
+   hour against the app's own 12/hour threshold for dead time. That is roughly half an
+   hour a session spent standing still, and the thing it competes with is sleep.
+
+   Four minutes is past the point where more rest buys meaningful hypertrophy (three
+   minutes already beats one in trained lifters, Schoenfeld et al. 2016), so nothing is
+   being given up. Every band's hard limit is clamped to it, the timer says so out loud
+   when you cross it, and the rest-discipline grade stops being forgiving past it. */
+const REST_CEILING = 240;
+
 function defaultProgram(){
+  /* v3.4. Loads are deliberately absent.
+
+     A starting weight written here is a second source of truth: it is a snapshot of one
+     day, it goes stale the moment you train, and it then disagrees with the log forever.
+     What belongs in a plan is what stays true in six months — sets, reps, RPE targets,
+     increment size, rest window, how to set the movement up. What you actually lifted
+     belongs in the log, and the app fills it in from there.
+
+     Supersets are gone as of v3.4: straight sets throughout. The pairing saved about
+     three minutes on Legs A while rest overrun was costing thirty, so the rest ceiling
+     is the lever that matters, not the pairing. The superset machinery stays in the app
+     for custom plans; the default programme simply no longer uses it. */
   return {
     /* ---- Day 1 · Push A — flat press · 16 sets ---- */
     pushA: [
-      exr("Smith Flat Bench Press", [7,8,8,9], "6-10", 115,
-          "25 lb bar + 45 a side. Touch chest, no bounce", {rest: REST_HEAVY}),
-      exr("Incline Dumbbell Bench Press", [7,8,9], "8-10", 35,
-          "35 lb a hand, 30 degree bench", {rest: REST_SECOND}),
-      exr("Mid Cable Fly (on bench)", [8,9,9], "12-15", 45,
+      exr("Smith Flat Bench Press", [7,8,8,9], "6-10", null,
+          "Touch chest, no bounce", {rest: REST_HEAVY}),
+      exr("Incline Dumbbell Bench Press", [7,8,9], "8-10", null,
+          "30 degree bench", {rest: REST_SECOND}),
+      exr("Mid Cable Fly (on bench)", [8,9,9], "12-15", null,
           "Hold the stretch behind the torso line", {rest: REST_ISO}),
       exr("Dumbbell Lateral Raise", [8,9,10], "12-20", null,
-          "Both dumbbells together", {rest: REST_ISO, superset: "pushA-delt-tri", calibrate: 15}),
-      exr("Overhead Cable Triceps Extension", [8,9,9], "8-12", 90,
+          "Both dumbbells together", {rest: REST_ISO}),
+      exr("Overhead Cable Triceps Extension", [8,9,9], "8-12", null,
           "Straight bar behind head, elbows high and close", {rest: REST_SECOND})
     ],
 
-    /* ---- Day 2 · Pull A — horizontal pull & traps · 20 sets ---- */
+    /* ---- Day 2 · Pull A — horizontal pull & traps · 20 sets ----
+       Shrug now runs before the rear delt fly. They were a superset pair in v3.3 and the
+       order was chosen to suit the pairing; with straight sets the heavier movement goes
+       first, while the grip and traps are fresh. */
     pullA: [
-      exr("Chest Supported Row Machine", [7,8,8,9], "6-10", 140,
+      exr("Chest Supported Row Machine", [7,8,8,9], "6-10", null,
           "Lower back stays out of it", {rest: REST_HEAVY}),
-      exr("Lat Pulldown", [7,8,9], "8-12", 130,
+      exr("Lat Pulldown", [7,8,9], "8-12", null,
           "Neutral or slightly wide grip", {rest: REST_SECOND}),
-      exr("Cable Lat Prayer", [8,9,9], "12-15", 75,
+      exr("Cable Lat Prayer", [8,9,9], "12-15", null,
           "Straight arms, hinged at hip, shoulders fully overhead", {rest: REST_ISO}),
-      exr("Cable Reverse Rear Delt Fly", [8,9,9], "15-20", 30,
-          "Crossover, swap which arm is on top each set", {rest: REST_ISO, superset: "pullA-delt-trap"}),
-      exr("Dumbbell Shrug", [9,9], "10-15", 50,
-          "50 lb a hand. Straight up, 1-sec squeeze, no rolling", {rest: REST_ISO}),
-      exr("Incline Dumbbell Curl", [8,9,9], "8-12", 30,
-          "30 lb a hand, 45 degree bench, arms behind torso", {rest: REST_SECOND, incr: 2.5}),
-      exr("Single-Arm Cable Hammer Curl", [9,10], "10-15", 30,
+      exr("Dumbbell Shrug", [9,9], "10-15", null,
+          "Straight up, 1-sec squeeze, no rolling", {rest: REST_ISO}),
+      exr("Cable Reverse Rear Delt Fly", [8,9,9], "15-20", null,
+          "Crossover, swap which arm is on top each set", {rest: REST_ISO}),
+      exr("Incline Dumbbell Curl", [8,9,9], "8-12", null,
+          "45 degree bench, arms behind torso", {rest: REST_SECOND, incr: 2.5}),
+      exr("Single-Arm Cable Hammer Curl", [9,10], "10-15", null,
           "Low pulley, D-handle, elbow pinned", {rest: REST_ISO})
     ],
 
     /* ---- Day 3 · Legs A — quad emphasis · 18 sets ----
-       Split squat runs 4 app sets, which is 2 per leg: 1 per leg was never going to
-       close a documented right-15 / left-6 gap. The two sets it gains come off leg
-       extension and standing calf raise, both of which are covered elsewhere in the
-       cycle (4 more squat sets here, 4 more calf sets on Legs B). */
+       Split squat runs 4 app sets, which is 2 per leg. */
     legsA: [
-      exr("Smith Machine Squat", [7,8,8,9], "6-10", 75,
+      exr("Smith Machine Squat", [7,8,8,9], "6-10", null,
           "Heels elevated on plates, full depth", {rest: REST_SQUAT}),
-      exr("Dumbbell Bulgarian Split Squat", [7,8,8,9], "8-12", 25,
-          "25 lb a hand. Upright torso, long stride", {rest: REST_SECOND, rampIn: 2}),
-      exr("Leg Extension", [8,9], "10-15", 70,
-          "Load cut from 85, which was failure at 9 reps", {rest: REST_ISO}),
-      exr("Seated Leg Curl", [7,8,9], "8-12", 100,
+      exr("Dumbbell Bulgarian Split Squat", [7,8,8,9], "8-12", null,
+          "Upright torso, long stride", {rest: REST_SECOND, rampIn: 2}),
+      exr("Leg Extension", [8,9], "10-15", null,
+          "Control the lowering; no swinging out of the bottom", {rest: REST_ISO}),
+      exr("Seated Leg Curl", [7,8,9], "8-12", null,
           "Seated, not lying. Hip flexion means a longer hamstring", {rest: REST_SECOND, rampIn: 2}),
-      exr("Standing Calf Raise (Smith)", [8,9,10], "8-12", 35,
-          "Knee straight for gastrocnemius. 2-sec bottom pause",
-          {rest: REST_ISO, superset: "legsA-calf-ab"}),
-      exr("Cable Ab Crunch", [9,10], "10-15", 150,
+      exr("Standing Calf Raise (Smith)", [8,9,10], "8-12", null,
+          "Knee straight for gastrocnemius. 2-sec bottom pause", {rest: REST_ISO}),
+      exr("Cable Ab Crunch", [9,10], "10-15", null,
           "Round the spine against the load", {rest: REST_ISO})
     ],
 
     /* ---- Day 4 · Push B — incline, dips & shoulders · 18 sets ---- */
     pushB: [
-      exr("Incline Smith Machine Bench Press", [7,8,8,9], "6-10", 95,
-          "25 lb bar + 35 a side, 30 degrees", {rest: REST_HEAVY}),
+      exr("Incline Smith Machine Bench Press", [7,8,8,9], "6-10", null,
+          "30 degrees", {rest: REST_HEAVY}),
       exr("Weighted Chest Dips", [7,8,9], "8-12", null,
-          "Bodyweight to start. Forward lean, elbows out, full depth", {rest: REST_SECOND}),
-      exr("Flat Dumbbell Bench Press", [9,9], "10-15", 40,
-          "40 lb a hand. Accessory now, not max effort. Deep stretch, no lockout",
+          "Forward lean, elbows out, full depth. Add load once the top of the range clears",
           {rest: REST_SECOND}),
-      exr("Smith Machine Shoulder Press", [7,8,9], "6-10", 45,
-          "25 lb bar + 10 a side", {rest: REST_SECOND}),
+      exr("Flat Dumbbell Bench Press", [9,9], "10-15", null,
+          "Accessory now, not max effort. Deep stretch, no lockout", {rest: REST_SECOND}),
+      exr("Smith Machine Shoulder Press", [7,8,9], "6-10", null,
+          "Seated, bar to chin height, no leg drive", {rest: REST_SECOND}),
       exr("Dumbbell Lateral Raise", [8,9,10], "12-20", null,
-          "Both dumbbells together, match Push A", {rest: REST_ISO, superset: "pushB-delt-tri", calibrate: 15}),
+          "Both dumbbells together, match Push A", {rest: REST_ISO}),
       exr("Overhead Cable Extension (V-bar)", [8,9,9], "10-14", null,
           "Bilateral, V-handle. Different implement to Push A's straight bar. Elbows high and close",
-          {rest: REST_ISO, calibrate: 75})
+          {rest: REST_ISO})
     ],
 
     /* ---- Day 5 · Pull B — vertical pull & arms · 18 sets ---- */
     pullB: [
       exr("Weighted Pull-Up", [7,8,8,9], "5-10", null,
-          "Bodyweight to start. Dead hang, chest to bar", {rest: REST_HEAVY, rampIn: 2}),
-      exr("Single-Arm Dumbbell Row", [7,8,9], "8-12", 50,
+          "Dead hang, chest to bar. No pull-up history in the log: if set 1 does not clear 5 clean reps, run band-assisted or 4-6 second negatives for the first two weeks rather than grinding 2-rep sets",
+          {rest: REST_HEAVY, rampIn: 2}),
+      exr("Single-Arm Dumbbell Row", [7,8,9], "8-12", null,
           "Pull to hip, shoulder blade travels forward at the bottom", {rest: REST_SECOND}),
-      exr("Single-Arm Cable Pulldown", [9,9], "12-15", 50,
+      exr("Single-Arm Cable Pulldown", [9,9], "12-15", null,
           "Kneeling, full overhead reach, slight lean away", {rest: REST_ISO}),
-      exr("Cable Face Pull (two D-handles)", [8,9,9], "15-20", 20,
+      exr("Cable Face Pull (two D-handles)", [8,9,9], "15-20", null,
           "Bilateral, one D-handle a tower at eye height. Pull toward the ears, rotate knuckles back",
-          {rest: REST_ISO, superset: "pullB-face-curl"}),
-      exr("Preacher Curl", [8,9,9], "8-12", 30,
+          {rest: REST_ISO}),
+      exr("Preacher Curl", [8,9,9], "8-12", null,
           "No preacher bench here: set the adjustable bench to about 75 degrees, stand behind it, drape the upper arm over the top pad",
           {rest: REST_SECOND, incr: 2.5}),
-      exr("Bayesian Cable Curl", [8,9,10], "10-15", 25,
+      exr("Bayesian Cable Curl", [8,9,10], "10-15", null,
           "Cable low and behind, elbow behind torso for a full stretch", {rest: REST_ISO, incr: 2.5})
     ],
 
     /* ---- Day 6 · Legs B — posterior chain · 18 sets ---- */
     legsB: [
-      exr("Dumbbell RDL", [7,8,8,9], "8-12", 50,
-          "50 lb a hand. Hips back, stop when the hamstrings stop lengthening. Straps ok",
-          {rest: REST_HEAVY}),
-      exr("Smith Machine Hip Thrust", [7,8,9], "8-12", 115,
+      exr("Dumbbell RDL", [7,8,8,9], "8-12", null,
+          "Hips back, stop when the hamstrings stop lengthening. Straps ok", {rest: REST_HEAVY}),
+      exr("Smith Machine Hip Thrust", [7,8,9], "8-12", null,
           "Chin tucked, 1-sec squeeze at lockout", {rest: REST_SECOND}),
-      exr("Seated Leg Curl", [8,9,9], "12-20", 75,
+      exr("Seated Leg Curl", [8,9,9], "12-20", null,
           "Same machine as Legs A, run lighter and higher-rep", {rest: REST_ISO, rampIn: 2}),
       exr("Reverse Hyperextension (flat bench)", [8,9], "10-15", null,
           "Face down on a flat bench, hips at the edge, legs hanging, raise to horizontal. Add a dumbbell between the feet once 15 reps clear",
-          {rest: REST_ISO, superset: "legsB-hyper-calf", rampIn: 2}),
+          {rest: REST_ISO, rampIn: 2}),
       exr("Seated Calf Raise (Smith)", [8,9,9,10], "10-15", null,
           "Bench under the bar, bar padded across the KNEES, feet on a plate so the heels drop below. Knee bent for soleus",
-          {rest: REST_ISO, calibrate: 45, rampIn: 2}),
+          {rest: REST_ISO, rampIn: 2}),
       exr("Hanging Leg Raise", [9,10], "8-15", null,
           "Curl the pelvis up, don't just raise the legs", {rest: REST_ISO})
     ],
@@ -2295,6 +2372,68 @@ function migrate(){
       ], {note:"Sessions, check-ins, rest days and sync settings were left untouched."});
     }
     save();
+  }
+
+  /* =================== v3.4: SUPERSETS OUT, LOADS OUT ===================
+
+     defaultProgram() only ever runs for a NEW profile. An existing one keeps the plan it
+     already had, so changing the defaults alone would have left every current user still
+     running v3.3 while the app claimed to be v3.4. That is the same trap the v3 migration
+     fell into, so this is written the same way: SHAPE-BASED, not flag-based. It asks the
+     stored plan what it looks like, which means it self-heals if a stale copy is ever
+     restored over the top by a sync.
+
+     It changes only what v3.4 actually mandates and leaves every other edit alone:
+
+     · superset pairings are removed (v3.4 is straight sets throughout)
+     · prescribed loads are cleared, because a number written into the plan is a snapshot
+       that goes stale the moment you train. NOTHING IS LOST: the loads live in the log,
+       and "last time" fills every row from there. The one visible effect is on a movement
+       with no history at all, which now asks for a feeler set instead of quoting a figure
+       that was only ever a guess.
+     · Pull A's shrug moves ahead of the rear delt fly, but only if the day is still in
+       the exact v3.3 order. If you have reordered it yourself, yours wins.               */
+  if(S.program && DAYS.every(d=>Array.isArray(S.program[d]))){
+    const dayLists = DAYS.concat(["finisher"]).map(k=>S.program[k]).filter(Array.isArray);
+    const eachEx = fn => dayLists.forEach(list => list.forEach(e=>{
+      if(!e) return;
+      fn(e);
+      if(e.alt) fn(e.alt);
+    }));
+
+    let pairsGone = 0, loadsGone = 0;
+    eachEx(e=>{ if(e.superset != null){ delete e.superset; pairsGone++; } });
+    eachEx(e=>{
+      if(e.weight != null){ e.weight = null; loadsGone++; }
+      // the calibrate seeds were starting figures too, and equally stale
+      if(e.calibrate != null) delete e.calibrate;
+    });
+
+    const V33_PULLA = ["Chest Supported Row Machine","Lat Pulldown","Cable Lat Prayer",
+      "Cable Reverse Rear Delt Fly","Dumbbell Shrug","Incline Dumbbell Curl",
+      "Single-Arm Cable Hammer Curl"];
+    let reordered = false;
+    const pa = S.program.pullA;
+    if(Array.isArray(pa) && pa.length === V33_PULLA.length &&
+       pa.every((e,i)=> nrm(e.name) === nrm(V33_PULLA[i]))){
+      pa.splice(3, 2, pa[4], pa[3]);          // swap rear delt fly and shrug
+      reordered = true;
+    }
+
+    if(pairsGone || loadsGone || reordered){
+      const bits = [];
+      if(pairsGone)  bits.push(pairsGone + " superset pairing" + (pairsGone===1?"":"s") + " removed, straight sets throughout");
+      if(loadsGone)  bits.push("Prescribed loads cleared from " + loadsGone + " exercise" + (loadsGone===1?"":"s") + "; the log is now the only source");
+      if(reordered)  bits.push("Pull A: shrug moved ahead of the rear delt fly");
+      // "4:00" written out rather than fmtClock(REST_CEILING): migrate() runs at load,
+      // before the module-level consts have initialised, and reaching for one here would
+      // throw on the temporal dead zone before the app ever painted.
+      bits.push("Hard rest ceiling of 4:00, no exceptions");
+      logPlanChange("programme", null, "Programme v3.4", bits,
+        {note:"Sets, reps and RPE targets are unchanged at 108 sets a cycle. Your logged sessions, loads and rest days were left untouched."});
+      invalidateMultiDay();
+      saveQuiet();
+    }
   }
 
   // Every one-limb-at-a-time movement gets the alternating-arms note, not just the
@@ -2805,20 +2944,21 @@ function restTargetFor(entry, st){
   if(Array.isArray(declared) && declared.length === 2){
     const lo = declared[0], hi = declared[1];
     return {band: lo >= 180 ? "heavy" : lo >= 120 ? "compound" : "isolation",
-      warn: Math.round(lo * 0.66), ideal: [lo, hi], hard: Math.round(hi * 1.8),
+      warn: Math.round(lo * 0.66), ideal: [lo, hi],
+      hard: Math.min(REST_CEILING, Math.round(hi * 1.8)),
       why: "this movement is prescribed " + fmtClock(lo) + "\u2013" + fmtClock(hi) + " of rest"};
   }
   const reps = repsGuess(entry, st);
   const rpe = parseFloat(st && st.rpe) || 0;
   if(reps <= 6 || rpe >= 9.5){
-    return {band:"heavy", warn:120, ideal:[180,300], hard:420,
+    return {band:"heavy", warn:120, ideal:[180,300], hard:REST_CEILING,
       why:"heavy, low-rep or near-max work, and the strength systems need 3-5 minutes to reload"};
   }
   if(reps <= 12){
-    return {band:"hypertrophy", warn:60, ideal:[90,180], hard:270,
+    return {band:"hypertrophy", warn:60, ideal:[90,180], hard:Math.min(REST_CEILING,270),
       why:"classic 8-12 rep hypertrophy work, which performs best on 1.5-3 minutes"};
   }
-  return {band:"metabolic", warn:30, ideal:[45,120], hard:180,
+  return {band:"metabolic", warn:30, ideal:[45,120], hard:Math.min(REST_CEILING,180),
     why:"high-rep metabolic work, which recovers fast, 45 to 120 seconds is plenty"};
 }
 function recordRestIfRunning(){
@@ -3081,6 +3221,15 @@ function showRestUI(min){
     ui.querySelectorAll(".rest-time").forEach(t=> t.textContent = fmtClock(sec));
     const ring = ui.querySelector(".pf-ring");
     if(ring) ring.style.setProperty("--sw", ((sec%60)/60*100)+"%");
+    /* Crossing the ceiling is announced once, not nagged: the dial goes red and stays
+       red, it buzzes if the phone supports it, and a short tone plays. Escalating every
+       tick would just train you to ignore it. */
+    if(sec >= REST_CEILING && !ui.dataset.over){
+      ui.dataset.over = "1";
+      ui.classList.add("rest-over");
+      restCeilingAlarm();
+    }
+    if(sec >= REST_CEILING) ui.classList.add("rest-over");
     const hub = ui.querySelector(".pf-hub");
     if(hub){
       const mins = Math.floor(sec/60);
@@ -3094,6 +3243,26 @@ function showRestUI(min){
       }
     }
   }, 250);
+}
+/* No audio file: a short WebAudio tone keeps the app a single offline document. Wrapped
+   because a browser that has never seen a user gesture will refuse to start the context,
+   and a failed beep must never take the timer down with it. */
+function restCeilingAlarm(){
+  try{
+    if(navigator.vibrate) navigator.vibrate([180, 90, 180]);
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    const ctx = new AC();
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = "sine"; osc.frequency.value = 660;
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.55);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.6);
+    setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 900);
+  }catch(e){ /* a silent alarm is still better than a broken timer */ }
+  toast("4 minutes. That is the cap \u2014 get the next set in.");
 }
 function hideRestUI(){
   const el = document.getElementById("restUI");
@@ -4641,12 +4810,19 @@ function viewToday(){
 
   if(isRestToday()){
     h += checkinCard();
+    const _xr = extraRestFor(todayStr());
+    const _xrLabel = _xr && (REST_REASONS.find(x=>x.k === _xr.reason) || {}).label;
     h += `<div class="card" style="text-align:center;padding:34px 20px">
       <h3 style="font-size:26px">Rest day</h3>
-      <div class="sub" style="margin-top:8px">Recovery is where the growth happens. Your rotation picks back up tomorrow with <b>${m.name}</b>.</div>
-      <div class="sub" style="margin-top:10px;font-size:12.5px;color:var(--faint)">Booked automatically after ${
-        esc(restEarnedBy(todayStr()) || "your last Legs day")}.</div>
+      <div class="sub" style="margin-top:8px">Recovery is where the growth happens. Your rotation picks back up ${
+        _xr ? "where it left off" : "tomorrow"} with <b>${m.name}</b>.</div>
+      <div class="sub" style="margin-top:10px;font-size:12.5px;color:var(--faint)">${
+        _xr
+          ? "Unscheduled" + (_xrLabel ? ", " + esc(_xrLabel.toLowerCase()) : "") +
+            ". Your two scheduled rests are untouched and the rotation hasn't moved."
+          : "Booked automatically after " + esc(restEarnedBy(todayStr()) || "your last Legs day") + "."}</div>
     </div>`;
+    if(_xr) h += `<div class="btn-row"><button class="btn ghost" id="undoExtraRest">Actually, train today</button></div>`;
     return h;
   }
 
@@ -4658,6 +4834,10 @@ function viewToday(){
       restCreditsLeft() ? "the next books itself after Legs"
       : "both booked"}</div>`;
   }
+  /* Deliberately understated and deliberately present. Taking a day when you are ill is
+     the programme working, not a failure of it, but it should still be a decision rather
+     than a shrug, so it costs one tap and asks why. */
+  h += `<div class="rest-note" style="margin-top:-4px"><button class="linklike" id="extraRestBtn">Need an unscheduled day off?</button></div>`;
 
   h += `<div class="card">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
@@ -5940,7 +6120,8 @@ function viewProgram(){
         + (asty === "side"  ? ' <span class="uni-badge">L / R</span>' : '')
         + (asty === "cross" ? ' <span class="uni-badge">crossover</span>' : '')
         + (e.alt ? ' <span class="alt-badge">⇄ '+esc(e.alt.name)+'</span>' : '');
-      let meta = `${e.sets}×${esc(e.reps)}${e.rpe?" · "+esc(rpeTxt(e.rpe)):""}${e.weight!=null?" · "+e.weight+" lb":""}${e.note?" · "+esc(e.note):""}`;
+      const _wl = e.weight != null ? e.weight : workingLoad(e.name);
+      let meta = `${e.sets}×${esc(e.reps)}${e.rpe?" · "+esc(rpeTxt(e.rpe)):""}${_wl!=null?" · "+_wl+" lb":""}${e.note?" · "+esc(e.note):""}`;
       if(e.alt) meta += `<br>next ${m.name.toLowerCase()} day: ${esc(nextUp)}`;
       h += `<div class="prog-ex">
         <div><b>${title}</b><div class="meta">${meta}</div></div>
@@ -5966,7 +6147,7 @@ function viewProgram(){
       <div class="sub" style="margin-bottom:6px">Runs at the end of every workout, in this order.</div>`;
     fin.forEach((e,i)=>{
       h += `<div class="prog-ex">
-        <div><b>${esc(e.name)}</b><div class="meta">${e.sets}×${esc(e.reps)}${e.rpe?" · "+esc(rpeTxt(e.rpe)):""}${e.weight!=null?" · "+e.weight+" lb":""}${e.note?" · "+esc(e.note):""}</div></div>
+        <div><b>${esc(e.name)}</b><div class="meta">${e.sets}×${esc(e.reps)}${e.rpe?" · "+esc(rpeTxt(e.rpe)):""}${(e.weight!=null?e.weight:workingLoad(e.name))!=null?" · "+(e.weight!=null?e.weight:workingLoad(e.name))+" lb":""}${e.note?" · "+esc(e.note):""}</div></div>
         <div class="icon-btns">
           <button data-up="finisher:${i}" aria-label="Move up">↑</button>
           <button data-down="finisher:${i}" aria-label="Move down">↓</button>
@@ -6204,6 +6385,31 @@ function bind(){
     else if(date)      toast("Rest booked for " + fmtDate(date) + ", the day after " + (restEarnedBy(date) || "Legs"));
     else               toast("Rest days book themselves the day after Legs A and Legs B");
   });
+
+  const xrb = $("#extraRestBtn");
+  if(xrb) xrb.onclick = ()=>{
+    if(S.active){ toast("Finish or discard the current workout first"); return; }
+    showModal(`<h3>Take today off</h3>
+      <div class="sub" style="margin:-4px 0 12px">This sits on top of your two scheduled rests.
+        It doesn't spend a credit, doesn't move the rotation, and the next Legs day still
+        books its own rest.</div>
+      <div class="field"><label>What's going on?</label>
+        <select id="xrWhy">${REST_REASONS.map(r=>`<option value="${r.k}">${esc(r.label)}</option>`).join("")}</select></div>
+      <div class="btn-row">
+        <button class="btn small" id="xrGo">Log today as rest</button>
+        <button class="btn ghost small" id="closeModal">Cancel</button>
+      </div>`);
+    $("#xrGo").onclick = ()=>{
+      takeExtraRest(todayStr(), $("#xrWhy").value);
+      save(); queueSync(); hideModal(); render();
+      toast("Logged as rest. Nothing lost.");
+    };
+  };
+  const uxr = $("#undoExtraRest");
+  if(uxr) uxr.onclick = ()=>{
+    releaseExtraRest(todayStr());
+    save(); queueSync(); render();
+  };
 
   // "See the full breakdown" on the Since-last-time card
   document.querySelectorAll("[data-fullgrade]").forEach(b=> b.onclick=()=>{
@@ -6636,7 +6842,16 @@ function startWorkout(wid){
       warm: warmupKindFor(resolvedProgram(wid).map(x=>x.chosen), _wi) || undefined,
       // the prescribed load, carried so the warm-up ramp has something to take a
       // percentage of. Distinct from the per-set weights on entry.sets.
+      /* The prescribed load, kept so the warm-up ramp has something to take a percentage
+         of. v3.4 leaves this null on every movement, so warmupLoad() falls through to the
+         log; it stays here because a custom plan may still declare one. */
       planWeight: (e.weight == null ? undefined : e.weight),
+      /* The microplate rule is part of the prescription and was being dropped on the way
+         into the session. It went unnoticed while the curls still carried a weight, since
+         progressionStep() then fell through to the dumbbell-isolation default of 2.5 and
+         got the right answer for the wrong reason. With the loads gone that fallback is
+         no longer reached, so the field has to travel. */
+      incr: (e.incr == null ? undefined : e.incr),
       rest: Array.isArray(e.rest) ? e.rest.slice() : undefined,
       superset: e.superset||undefined, supersetEnd: e.supersetEnd||undefined,
       // which alternating scheme this movement uses, and which side it opens on 
@@ -6902,7 +7117,7 @@ function planChangeSentence(c){
     onDay+", to position "+c.pos+" of "+c.of+".";
   if(c.kind === "weight") return "<b>"+esc(c.name)+"</b>"+onDay+", load "+
     (bits.length ? bits.join("; ") : "changed")+".";
-  if(c.kind === "deload" || c.kind === "rule" || c.kind === "programme")
+  if(c.kind === "deload" || c.kind === "rule" || c.kind === "programme" || c.kind === "rest")
     return "<b>"+esc(c.name)+"</b>"+tail+".";
   return "Changed <b>"+esc(c.prevName || c.name)+"</b>"+onDay+tail+".";
 }
@@ -7548,7 +7763,7 @@ function scoreWorkout(sess){
         {na:true, unlock:"Leave the rest timer running between sets."});
       return;
     }
-    let sum = 0, short = 0, long = 0, good = 0;
+    let sum = 0, short = 0, long = 0, good = 0, over = 0;
     timed.forEach(({e, st})=>{
       const t = restTargetFor(e, st);
       const r = st.rest;
@@ -7557,6 +7772,11 @@ function scoreWorkout(sess){
       else if(r < t.ideal[0]){
         s = Math.max(0, r / t.ideal[0]) * 0.85;   // credit falls off toward nothing
         if(r < t.warn) short++;
+      } else if(r > REST_CEILING){
+        /* Past the ceiling the floor is gone. A 17-minute rest used to score 0.55, the
+           same as a 4-minute one, which is why the grade never argued with it. */
+        s = Math.max(0, 0.4 - (r - REST_CEILING)/(REST_CEILING*2));
+        long++; over++;
       } else {
         s = Math.max(0.55, 1 - (r - t.ideal[1])/(t.ideal[1]*2));  // long rests cost far less
         if(r > t.hard) long++;
@@ -7567,6 +7787,7 @@ function scoreWorkout(sess){
     why.push(good+" of "+timed.length+" timed rests sat inside the window that set's load called for.");
     if(short) why.push(short+" rest"+(short>1?"s were":" was")+" cut short for the intensity: heavy and near-failure sets want 3-5 min, 8-12 rep work 1.5-3 min.");
     if(long) why.push(long+" rest"+(long>1?"s ran":" ran")+" well past the window, which stretches the session without adding stimulus.");
+    if(over) why.push(over+" rest"+(over>1?"s broke":" broke")+" the "+fmtClock(REST_CEILING)+" ceiling outright. That is the one rest rule with no exceptions.");
     const bands = {};
     timed.forEach(({e,st})=>{ const b = restTargetFor(e,st).band; bands[b] = (bands[b]||0)+1; });
     why.push("Set mix: "+Object.keys(bands).map(b=>bands[b]+" "+b).join(", ")+".");
@@ -7574,6 +7795,7 @@ function scoreWorkout(sess){
     add("rest","Rest discipline",12,earned,why,
       short > timed.length*0.3
         ? "Short rests on heavy work quietly cap your loads: you end up fighting the last set instead of the weight. Give the compounds a full 3 minutes."
+        : over ? "Nothing past four minutes buys you anything. Set the phone down, count the clock, and start the next set."
         : long > timed.length*0.3 ? "Trim the long rests on accessories to about 90 seconds; you'll cut real time off the session for nothing."
         : null);
   })();
@@ -7900,6 +8122,14 @@ function openScoreCard(sess, onDone){
    per-hand jump on a 30 lb curl is a 17% load increase, and that exact jump is
    documented as the cause of four stalled arm lifts in this log. Anything carrying an
    explicit `incr` (the three curls) overrides the class default. */
+/* Any load this movement is known to use: prescribed, carried into the session, or —
+   the normal case in v3.4 — whatever the log says you last lifted. */
+function knownLoad(e){
+  if(!e) return null;
+  if(e.weight != null && e.weight !== "") return parseFloat(e.weight);
+  if(e.planWeight != null && e.planWeight !== "") return parseFloat(e.planWeight);
+  return workingLoad(e.name);
+}
 function progressionStep(e){
   const n = nrm(e && e.name);
   if(e && e.incr != null){
@@ -7911,14 +8141,18 @@ function progressionStep(e){
       ? {amount: 10, alt: 20, unit: "lb total", why: "Smith bar, lower body, 10 to 20 lb"}
       : {amount: 10, unit: "lb total", why: "Smith bar, upper body"};
   }
-  if(!e || e.weight == null){
-    return {amount: 5, unit: "lb", bodyweight: true,
-            why: "bodyweight movement: add external load once the top of the range clears on the first two sets"};
-  }
   if(/dumbbell|\bdb\b/.test(n)){
     return isCompound(e.name)
       ? {amount: 5, unit: "lb a hand", why: "dumbbell compound"}
       : {amount: 2.5, unit: "lb a hand", why: "dumbbell isolation, microplates"};
+  }
+  /* "No weight written down" used to be the test for a bodyweight movement. v3.4 removed
+     every prescribed load, which made that test true of EVERYTHING — a cable row came
+     back advised to add external load once it could do bodyweight reps. The question is
+     really whether any load is known for it at all, from any source. */
+  if(knownLoad(e) == null){
+    return {amount: 5, unit: "lb", bodyweight: true,
+            why: "nothing loaded logged yet: add external load once the top of the range clears on the first two sets"};
   }
   return {amount: 5, unit: "lb", why: "one pin on the stack"};
 }
@@ -8392,14 +8626,51 @@ function fmtTimeOfDay(ms){
    than admitting there isn't one, so the exercise carries `calibrate` with a ballpark
    and asks for a feeler set the first time you perform it.
    ===================================================================== */
+/* v3.4 removed every prescribed load from the plan, which also removed the `calibrate`
+   seeds that used to trigger this. The trigger is now the thing that actually matters:
+   no load prescribed AND nothing in the log to inherit one from. For all but a couple of
+   movements the history answers it and this never appears; for a genuinely new lift, it
+   asks for a feeler set instead of inventing a number. */
 function needsCalibration(e){
-  return !!(e && e.calibrate != null && e.weight == null);
+  if(!e || e.weight != null) return false;
+  if(e.calibrate != null) return true;         // still honoured if a custom plan sets one
+  return !hasLoadHistory(e.name);
+}
+/* What you are actually lifting on a movement, read from the log rather than the plan.
+
+   v3.4 took the loads out of the programme, which left every "start load" reading
+   "bodyweight" — technically what a null weight means, and nonsense against a Smith
+   squat. The honest answer was always in the log, so this goes and gets it: the heaviest
+   load on the most recent session that recorded one. */
+function workingLoad(name){
+  const k = nrm(name);
+  for(let i = (S.sessions||[]).length - 1; i >= 0; i--){
+    const sn = S.sessions[i];
+    for(const en of (sn.entries || [])){
+      if(nrm(en.name) !== k) continue;
+      const loads = (en.sets || [])
+        .map(st => parseFloat(st.weight))
+        .filter(v => !isNaN(v) && v > 0);
+      if(loads.length) return Math.max.apply(null, loads);
+    }
+  }
+  return null;
+}
+// any logged set of this movement, under any day, that recorded a load
+function hasLoadHistory(name){
+  const k = nrm(name);
+  return (S.sessions || []).some(sn =>
+    (sn.entries || []).some(en =>
+      nrm(en.name) === k && (en.sets || []).some(st => st.weight != null && st.weight !== "")));
 }
 function calibrateHTML(e){
+  const seed = (e && e.calibrate != null)
+    ? ` of about ${esc(String(e.calibrate))} lb` : "";
   return `<div class="cal-note">
-    <b>Calibrate this one</b> No baseline yet. Do one feeler set of about
-    ${esc(String(e.calibrate))} lb, take it to roughly the top of the rep range, then log
-    what actually worked. That becomes the starting load.
+    <b>Calibrate this one</b> Nothing logged for it yet, and the plan deliberately doesn't
+    prescribe a load. Do one feeler set${seed}, take it to roughly the top of the rep range,
+    then log what actually worked. That becomes the starting load and progression takes it
+    from there.
   </div>`;
 }
 function setCalibratedLoad(name, w){
@@ -8611,8 +8882,12 @@ function warmupKindFor(list, index){
 function warmupPlan(e, kind){
   if(!kind) return [];
   const spec = kind === "full" ? WARM_FULL : WARM_LIGHT;
-  // programme entries carry `weight`; live session entries carry `planWeight`
-  const w = parseFloat(e && (e.weight != null ? e.weight : e.planWeight));
+  /* Programme entries carry `weight`, live session entries carry `planWeight`, and as of
+     v3.4 both are normally empty — the load lives in the log. Without this last fallback
+     a ramp had nothing to take a percentage of and every warm-up silently vanished. */
+  const w = parseFloat(e && (e.weight != null ? e.weight
+                      : e.planWeight != null ? e.planWeight
+                      : workingLoad(e.name)));
   if(!(w > 0)){
     // bodyweight: there is no percentage to take, so ramp on reps instead
     return kind === "full"
@@ -9373,7 +9648,7 @@ async function gistFetch(path, opts={}){
   return res.json();
 }
 function payload(){
-  return JSON.stringify({program:S.program, pointer:S.pointer, cycleStart:S.cycleStart, cycleDone:S.cycleDone, restDays:S.restDays||[], restLog:S.restLog||[], restDeleted:S.restDeleted||[], restAuto:S.restAuto||[], lastCycle:S.lastCycle||null, lastReview:S.lastReview||null, checkins:S.checkins||{}, exAliases:S.exAliases||{}, stalls:S.stalls||{}, deload:S.deload||null,
+  return JSON.stringify({program:S.program, pointer:S.pointer, cycleStart:S.cycleStart, cycleDone:S.cycleDone, restDays:S.restDays||[], restLog:S.restLog||[], restDeleted:S.restDeleted||[], restAuto:S.restAuto||[], restExtra:S.restExtra||[], lastCycle:S.lastCycle||null, lastReview:S.lastReview||null, checkins:S.checkins||{}, exAliases:S.exAliases||{}, stalls:S.stalls||{}, deload:S.deload||null,
     blockStart:S.blockStart||null, planStart:S.planStart||null, wakeTime:S.wakeTime||null, sleepTarget:S.sleepTarget||null,
     asymRetired:S.asymRetired||{}, asymRetest:S.asymRetest||null,
     volWindow:S.volWindow||"cycle", askWhy:S.askWhy!==false, deleted:(S.deleted||[]).slice(-500), planLog:(S.planLog||[]).slice(-500), sessions:S.sessions, savedAt:S.savedAt}, null, 1);
@@ -9463,6 +9738,25 @@ function mergePlanLog(localArr, remoteArr){
    day, and two devices that each spent one should end up with both rather than with
    whichever happened to sync last. Tolerates the old single-object shape on the way in
    so a gist written by v2 still merges. */
+/* The two lists that hang off the rest days: which were booked automatically, and which
+   were taken unscheduled. Both were being WRITTEN to the gist and never read back, so a
+   second device saw the rest days but not why they existed — the Today card would credit
+   the wrong Legs session, and an unscheduled day came back looking scheduled.
+
+   Union, then tombstones, exactly as the rest days themselves are merged. */
+function mergeRestSideLists(remote){
+  if(!remote) return;
+  const dead = S.restDeleted || [];
+  S.restAuto = [...new Set([...(S.restAuto||[]), ...(remote.restAuto||[])])]
+    .filter(d => dead.indexOf(d) < 0).sort();
+  const seen = {};
+  [...(S.restExtra||[]), ...(remote.restExtra||[])].forEach(x=>{
+    if(!x || !x.date || dead.indexOf(x.date) > -1) return;
+    // the earlier record wins, so re-syncing cannot rewrite why a day was taken
+    if(!seen[x.date] || (x.at||0) < (seen[x.date].at||0)) seen[x.date] = x;
+  });
+  S.restExtra = Object.keys(seen).sort().map(k=>seen[k]);
+}
 function pickRestDay(localRD, remoteRD){
   const norm = v => Array.isArray(v) ? v.slice() : (v && v.date) ? [v.date] : [];
   const all = [...new Set(norm(localRD).concat(norm(remoteRD)))].filter(Boolean).sort();
@@ -9542,6 +9836,7 @@ async function pullFromGist(){
     S.planLog = mergePlanLog(S.planLog, remote.planLog);
     S.restDays = pickRestDay(S.restDays, remote.restDays || remote.restDay)
       .filter(d=>(S.restDeleted||[]).indexOf(d) < 0);
+    mergeRestSideLists(remote);
     S.deleted = [...tomb];
     S.sessions = mergeSessions(S.sessions, remote.sessions||[], tomb);
     reconcileCycleAfterMerge(remote.cycleStart);
@@ -9597,6 +9892,7 @@ async function syncNow(announce){
       if(remote.pointer != null) S.pointer = remote.pointer;
       S.restDays = pickRestDay(S.restDays, remote.restDays || remote.restDay)
       .filter(d=>(S.restDeleted||[]).indexOf(d) < 0);
+    mergeRestSideLists(remote);
       if(remote.lastCycle) S.lastCycle = remote.lastCycle;
       if(remote.lastReview) S.lastReview = remote.lastReview;
       S.checkins = Object.assign({}, S.checkins||{}, remote.checkins||{});
@@ -9626,6 +9922,7 @@ async function syncNow(announce){
       S.planLog = mergePlanLog(S.planLog, remote.planLog);
       S.restDays = pickRestDay(S.restDays, remote.restDays || remote.restDay)
       .filter(d=>(S.restDeleted||[]).indexOf(d) < 0);
+    mergeRestSideLists(remote);
       S.deleted = [...tomb];
       S.sessions = mergeSessions(S.sessions, remote.sessions||[], tomb);
       reconcileCycleAfterMerge(remote.cycleStart);
@@ -9679,7 +9976,12 @@ function planExerciseRow(e, wid, opts){
   if(asty === "side")  bits.push("one limb at a time, alternating L/R each set");
   if(asty === "cross") bits.push("both arms, alternating which crosses on top");
   if(e.note) bits.push(e.note);
-  const load = (e.weight != null && e.weight !== "") ? e.weight + " lb" : "bodyweight";
+  /* Prescribed load first (a custom plan may still declare one), then what the log says
+     you are lifting, and only then the honest "nothing logged yet". */
+  const logged = workingLoad(e.name);
+  const load = (e.weight != null && e.weight !== "") ? e.weight + " lb"
+             : logged != null ? logged + " lb"
+             : "from your first set";
   return `<tr>
     <td><b>${esc(e.name)}</b>${opts.altOf ? `<br><span class="sm">alternates with ${esc(opts.altOf)}</span>` : ""}${
       opts.ss ? `<br><span class="sm">superset ${opts.ss==="first"?"1 of 2":"2 of 2"}</span>` : ""}</td>
@@ -9796,7 +10098,7 @@ function buildPlanInner(){
       <p class="meta">${list.length} exercise${list.length===1?"":"s"} · ${totalSets} working sets ·
       run ${times} time${times===1?"":"s"} per cycle</p>
       <table>
-        <thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>RPE</th><th>Start load</th><th>Notes</th></tr></thead>
+        <thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>RPE</th><th>Working load</th><th>Notes</th></tr></thead>
         <tbody>`;
     list.forEach((e, i)=>{
       const _ssi = supersetInfo(list, i);
@@ -9816,7 +10118,7 @@ function buildPlanInner(){
     body += `<h2>Finisher</h2>
       <p class="meta">Runs at the end of every workout, in this order.</p>
       <table>
-        <thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>RPE</th><th>Start load</th><th>Notes</th></tr></thead>
+        <thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>RPE</th><th>Working load</th><th>Notes</th></tr></thead>
         <tbody>${fin.map(e=>planExerciseRow(e, "finisher")).join("")}</tbody>
       </table>`;
   }
