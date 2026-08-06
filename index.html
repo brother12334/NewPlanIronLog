@@ -282,13 +282,12 @@ h1,h2,h3{font-family:var(--disp);text-transform:uppercase;letter-spacing:.04em;m
    are aiming at and the number you log sit in the same cell. Muted, because it is a
    reference value and the input is the thing you interact with. */
 /* ================= TEMPORARY-RULE BANNERS =================
-   Deload, sleep window, drift and the two expiring rules. All four share a shape: a
+   Deload, sleep window and the two expiring rules. All of them share a shape: a
    coloured left edge naming the constraint, the consequence in readable type, and the
    reasoning underneath in grey. They sit above the exercise list because every one of
    them changes what you should do BEFORE the first set, not after. */
 .deload-card{border-left:4px solid var(--back);background:linear-gradient(180deg,rgba(74,130,224,.08),transparent)}
 .sleep-card{border-left:4px solid var(--bad);background:linear-gradient(180deg,rgba(224,82,72,.08),transparent)}
-.drift-card{border-left:4px solid var(--bad);background:linear-gradient(180deg,rgba(224,82,72,.06),transparent)}
 .rule-card{border-left:4px solid var(--arms);background:linear-gradient(180deg,rgba(232,182,44,.06),transparent);padding:12px 14px}
 .rule-row{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;color:var(--dim);padding:4px 0}
 .rule-row + .rule-row{border-top:1px solid var(--line);margin-top:4px;padding-top:8px}
@@ -1284,7 +1283,7 @@ body.cele-open{overflow:hidden}
 /* Bumped by 0.1 on every round of edits to this file. It is shown on the splash, in
    Setup, and on the printed programme, so a report you handed to someone last month can
    be matched against the build that produced it. */
-const APP_VERSION = "3.5";
+const APP_VERSION = "3.6";
 /* ================= DATA ================= */
 const LS_KEY = "ironlog.v1";
 const GIST_FILE = "ironlog-data.json";
@@ -4862,7 +4861,6 @@ function viewToday(){
   </div>`;
   h += deloadBannerHTML();
   h += sleepWindowHTML(wid);
-  h += driftHTML();
   h += asymRetestHTML();
   h += ruleBannerHTML();
   // The one thing worth changing today, taken from the grade of your last session of
@@ -8681,8 +8679,15 @@ function hasLoadHistory(name){
       nrm(en.name) === k && (en.sets || []).some(st => st.weight != null && st.weight !== "")));
 }
 function calibrateHTML(e){
+  /* A declared seed wins, then an estimate from a related lift, then nothing. The
+     estimate always names its source: a figure with no provenance is exactly the kind of
+     invented number v3.4 set out to remove from the plan. */
+  const est = (e && e.calibrate == null && !isBodyweightMovement(e && e.name))
+    ? estimateLoadFrom(e && e.name) : null;
   const seed = (e && e.calibrate != null)
-    ? ` of about ${esc(String(e.calibrate))} lb` : "";
+    ? ` of about ${esc(String(e.calibrate))} lb`
+    : est ? ` of about ${est.load} lb, going by your ${esc(est.from)} at ${est.fromLoad} lb`
+    : "";
   return `<div class="cal-note">
     <b>Calibrate this one</b> Nothing logged for it yet, and the plan deliberately doesn't
     prescribe a load. Do one feeler set${seed}, take it to roughly the top of the rep range,
@@ -8758,57 +8763,7 @@ function ruleBannerHTML(){
     `<div class="rule-row"><span class="rule-k">${esc(b.k)}</span><span>${esc(b.v)}</span></div>`).join("") + `</div>`;
 }
 
-/* =====================================================================
-   DRIFT GUARD
 
-   The original diagnosis was never "days aren't pinned to the calendar" — it was that
-   muscle groups were going 8 to 11 days between sessions. That is the thing worth
-   catching.
-
-   The threshold moved from 5 to 7 when the second rest day landed. On the eight-day
-   cycle every muscle comes round in exactly four days: chest on Push A then Push B,
-   back on Pull A then Pull B, legs on Legs A then Legs B, and the same four wrapping
-   into the next cycle. Five therefore left one day of slack, so a single missed day
-   raised a red card and the flag stopped meaning anything. Seven fires when two or
-   three days are genuinely gone, which is the case it was built for.
-   ===================================================================== */
-const DRIFT_DAYS = 7;
-function driftReport(){
-  const now = Date.now();
-  const last = {};
-  S.sessions.forEach(s=>{
-    (s.entries || []).forEach(e=>{
-      const mm = musclesFor(e.name);
-      if(!mm) return;
-      const worked = (e.sets || []).some(isWorkingSet);
-      if(!worked) return;
-      Object.keys(mm).forEach(m=>{
-        if(mm[m] < 0.5) return;           // assisting is not training
-        if(!last[m] || s.startedAt > last[m]) last[m] = s.startedAt;
-      });
-    });
-  });
-  const stale = [];
-  MKEYS.forEach(m=>{
-    if(GROUPS[m].optional) return;
-    if(!last[m]) return;                  // never trained is a weak point, not drift
-    const days = (now - last[m]) / DAY_MS;
-    if(days >= DRIFT_DAYS) stale.push({m, days: Math.floor(days)});
-  });
-  return stale.sort((a,b)=>b.days - a.days);
-}
-function driftHTML(){
-  const stale = driftReport();
-  if(!stale.length) return "";
-  const top = stale.slice(0, 4);
-  return `<div class="card drift-card">
-    <div class="fc-k" style="color:var(--bad)">Drifting</div>
-    <div class="fc-do">${top.map(x=>esc(gName(x.m)) + " " + x.days + " days").join(" · ")}${
-      stale.length > 4 ? " and " + (stale.length - 4) + " more" : ""}</div>
-    <div class="fc-sub">On this cycle every muscle should come round inside four days.
-      Past ${DRIFT_DAYS} means days have genuinely been lost, not just shuffled.</div>
-  </div>`;
-}
 
 /* ---------- the banners these rules put on Today ---------- */
 function deloadBannerHTML(){
@@ -8896,6 +8851,154 @@ function warmupKindFor(list, index){
   if(compounds.length > 1 && compounds[1] === index) return "light";
   return null;
 }
+/* =====================================================================
+   ESTIMATING A STARTING LOAD FROM A RELATED LIFT
+
+   v3.4 took the prescribed loads out, so a movement you have never logged has no number
+   at all and its warm-up fell back to "empty bar". That is safe but lazy: you have
+   months of history on lifts that load the same muscles through the same pattern, and a
+   Smith incline press tells you a great deal about where a Smith flat press starts.
+
+   This is deliberately only good enough for a WARM-UP. The ramp takes 40/65/90% of it,
+   the working set is still yours to pick, and every factor below errs LOW, so the worst
+   case is a warm-up that felt easy. It is never used to prescribe a working weight.
+
+   Similarity is scored on the muscle map the app already keeps, cosine over the two
+   movements' muscle vectors, then weighted by whether they share a movement pattern and
+   an implement. A pattern match matters more than raw muscle overlap: leg extension and
+   Smith squat both hit quads, but one tells you nothing about the other's load.
+   ===================================================================== */
+const MOVE_PATTERNS = [
+  ["hpress", /bench|chest press|\bfly|flye|pec deck|\bdips?\b|push[- ]?up/],
+  ["vpress", /shoulder press|overhead press|military/],
+  ["row",    /\brow\b|face pull|rear delt|shrug/],
+  ["vpull",  /pulldown|pull[- ]?up|chin[- ]?up|lat prayer|pullover/],
+  ["squat",  /squat|leg press|hack|lunge|step[- ]?up/],
+  ["hinge",  /\brdl\b|romanian|deadlift|hip thrust|good morning|hyperextension|back extension/],
+  ["curl",   /curl(?!.*leg)/],
+  ["legcurl",/leg curl/],
+  ["legext", /leg extension/],
+  ["tri",    /tricep|pushdown|press[- ]?down|kickback|overhead cable extension|skull/],
+  ["raise",  /lateral raise|front raise/],
+  ["calf",   /calf/],
+  ["ab",     /crunch|hanging leg raise|knee raise|sit[- ]?up/]
+];
+function movePattern(name){
+  const k = nrm(name);
+  for(const [tag, re] of MOVE_PATTERNS) if(re.test(k)) return tag;
+  return null;
+}
+/* The implement matters because it sets the leverage, not the muscle. A dumbbell press
+   and a Smith press of the same difficulty are logged as very different numbers: one is
+   per hand, the other includes a bar. */
+function implementOf(name){
+  const k = nrm(name);
+  if(/smith/.test(k))                    return "smith";
+  if(/barbell|\bbar\b(?!bell)/.test(k))  return "barbell";
+  if(/dumbbell|\bdb\b/.test(k))          return "dumbbell";
+  if(/cable/.test(k))                    return "cable";
+  if(/machine|pulldown|leg press|pec deck/.test(k)) return "machine";
+  return "other";
+}
+/* Dumbbell and single-arm loads are recorded PER HAND; a bar or a stack is the total.
+   Comparing them without converting is how a 95 lb Smith press produced a 66 lb dumbbell
+   estimate — a number that is nonsense per hand and would have put a warm-up above the
+   working set. Roughly, one hand does a bit under half of what the bar does, since each
+   side has to stabilise independently. */
+function isPerHandLoad(name){
+  /* The app already knows which movements are one limb at a time. Asking it beats
+     re-deriving it from the name: Preacher Curl is unilateral in this programme but
+     says nothing about it in the title, so a name test read it as a two-handed bar
+     load and its estimate came out ABOVE the lift it was estimated from. */
+  if(isSingleArm({name: name})) return true;
+  return /dumbbell|\bdb\b/.test(nrm(name));
+}
+function perHandConversion(targetName, refName){
+  const t = isPerHandLoad(targetName), r = isPerHandLoad(refName);
+  if(t === r) return 1;
+  return t ? 0.45 : 1.9;
+}
+function muscleCosine(a, b){
+  if(!a || !b) return 0;
+  let dot = 0, na = 0, nb = 0;
+  const keys = new Set(Object.keys(a).concat(Object.keys(b)));
+  keys.forEach(k=>{
+    const x = a[k] || 0, y = b[k] || 0;
+    dot += x * y; na += x * x; nb += y * y;
+  });
+  if(!na || !nb) return 0;
+  return dot / Math.sqrt(na * nb);
+}
+/* Every distinct movement in the log that has a load, with the heaviest load recorded on
+   its most recent outing. Cached against the size and tail of the session list, because
+   warmupPlan() runs for every exercise on every render. */
+let _loadIndex = null, _loadIndexKey = "";
+function loggedLoadIndex(){
+  const list = S.sessions || [];
+  const tail = list.length ? (list[list.length-1].id + ":" + (list[list.length-1].finishedAt||0)) : "";
+  const key = list.length + "|" + tail;
+  if(_loadIndex && _loadIndexKey === key) return _loadIndex;
+  const out = {};
+  list.forEach(sn=>{
+    (sn.entries || []).forEach(en=>{
+      const loads = (en.sets || []).map(st=>parseFloat(st.weight)).filter(v=>!isNaN(v) && v > 0);
+      if(!loads.length) return;
+      const k = nrm(en.name);
+      const best = Math.max.apply(null, loads);
+      // later sessions win outright: this is "what you lift now", not "what you ever lifted"
+      out[k] = {name: en.name, load: best, at: sn.startedAt || 0};
+    });
+  });
+  _loadIndex = out; _loadIndexKey = key;
+  return out;
+}
+function invalidateLoadIndex(){ _loadIndex = null; _loadIndexKey = ""; }
+
+/* The closest thing in your log to a movement you have not done, and what it suggests as
+   a starting point. Returns null rather than guessing wildly when nothing is close. */
+function estimateLoadFrom(name){
+  const mine = musclesFor(name);
+  if(!mine) return null;
+  const myPat = movePattern(name), myImp = implementOf(name);
+  const idx = loggedLoadIndex();
+  const meKey = nrm(name);
+  let best = null;
+
+  Object.keys(idx).forEach(k=>{
+    if(k === meKey) return;
+    const cand = idx[k];
+    const cm = musclesFor(cand.name);
+    if(!cm) return;
+    const cos = muscleCosine(mine, cm);
+    if(cos < 0.6) return;                         // not the same job, not comparable
+    const samePat = myPat && movePattern(cand.name) === myPat;
+    const sameImp = implementOf(cand.name) === myImp;
+    // a shared pattern is worth more than muscle overlap alone
+    const score = cos + (samePat ? 0.6 : 0) + (sameImp ? 0.25 : 0);
+    if(!best || score > best.score) best = {score, cos, samePat, sameImp, ref: cand};
+  });
+
+  if(!best) return null;
+  /* Every factor sits below 1: the estimate should come in under the related lift, since
+     a warm-up that is slightly light costs nothing and one that is heavy is a warm-up you
+     have to recover from. */
+  const factor = (best.samePat && best.sameImp) ? 0.90
+               : best.samePat                   ? 0.70
+               : best.cos >= 0.85               ? 0.55
+               : 0.45;
+  /* Never estimate ABOVE a lift you have actually done. The per-hand-to-bar conversion
+     can legitimately point higher — dumbbell presses really do imply a heavier barbell —
+     but this number only ever feeds a warm-up ramp, and the whole design errs low on
+     purpose. Without the cap a 30 lb/hand curl produced a 40 lb cable curl estimate,
+     whose top ramp step landed above the working set it was meant to prepare for. */
+  const raw = Math.min(best.ref.load,
+                       best.ref.load * factor * perHandConversion(name, best.ref.name));
+  const est = warmRound(raw, name);
+  if(!(est > 0)) return null;
+  return {load: est, from: best.ref.name, fromLoad: best.ref.load,
+          confident: !!(best.samePat && best.sameImp)};
+}
+
 function warmupPlan(e, kind){
   if(!kind) return [];
   const spec = kind === "full" ? WARM_FULL : WARM_LIGHT;
@@ -8906,9 +9009,19 @@ function warmupPlan(e, kind){
                       : e.planWeight != null ? e.planWeight
                       : workingLoad(e.name)));
   if(!(w > 0)){
-    /* No load to take a percentage of. Two different reasons for that, and they want
-       different instructions: a pull-up really is bodyweight, whereas a Smith squat you
-       have not calibrated yet wants the empty bar and a feel for it. */
+    /* Nothing logged for this movement, but something related probably is. A Smith
+       incline press puts a real number on a Smith flat press, and ramping off that beats
+       ramping off an empty bar. Bodyweight movements are excluded: there is no external
+       load to estimate, and "70% of your row" means nothing on a pull-up. */
+    if(!isBodyweightMovement(e && e.name)){
+      const est = estimateLoadFrom(e && e.name);
+      if(est) return spec.map(x=>({
+        label: warmRound(est.load * x.pct, e.name) + " lb",
+        reps: x.reps, pct: Math.round(x.pct * 100), est: est
+      }));
+    }
+    /* No close enough relative either. A pull-up really is bodyweight, whereas a Smith
+       squat you have not calibrated yet wants the empty bar and a feel for it. */
     if(isBodyweightMovement(e && e.name)){
       return kind === "full"
         ? [{label:"bodyweight", reps:"8"}, {label:"bodyweight", reps:"5"}]
@@ -8929,7 +9042,9 @@ function warmupHTML(e, kind){
     <span class="warm-sets">${plan.map(x=>
       `<span class="warm-set">${esc(x.label)} <i>&times;${esc(x.reps)}</i></span>`).join("")}</span>
     <span class="warm-note">${
-      plan[0] && plan[0].uncal
+      plan[0] && plan[0].est
+        ? `estimated from your ${esc(plan[0].est.from)} at ${plan[0].est.fromLoad} lb, since this one has nothing logged yet. Deliberately light, and your first working set replaces the guess. Not counted.`
+      : plan[0] && plan[0].uncal
         ? "building up to your first working set, which sets the load from here on. Not counted."
       : plan[0] && plan[0].pct == null
         ? (kind === "full" ? "easy reps to warm the joint, no added load. Not counted."
