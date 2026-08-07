@@ -12,7 +12,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 115,
+    "weight": null,
     "note": "25 lb bar + 45 a side. Touch chest, no bounce",
     "rest": [
      180,
@@ -29,7 +29,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 35,
+    "weight": null,
     "note": "35 lb a hand, 30 degree bench",
     "rest": [
      120,
@@ -46,7 +46,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": 45,
+    "weight": null,
     "note": "Hold the stretch behind the torso line",
     "rest": [
      90,
@@ -68,9 +68,7 @@
     "rest": [
      90,
      150
-    ],
-    "superset": "pushA-delt-tri",
-    "calibrate": 15
+    ]
    },
    {
     "name": "Overhead Cable Triceps Extension",
@@ -82,7 +80,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": 90,
+    "weight": null,
     "note": "Straight bar behind head, elbows high and close",
     "rest": [
      120,
@@ -102,7 +100,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 145,
+    "weight": null,
     "note": "Lower back stays out of it",
     "rest": [
      180,
@@ -119,7 +117,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 130,
+    "weight": null,
     "note": "Neutral or slightly wide grip",
     "rest": [
      120,
@@ -136,8 +134,24 @@
      9
     ],
     "rpe": "8-9",
-    "weight": 75,
+    "weight": null,
     "note": "Straight arms, hinged at hip, shoulders fully overhead",
+    "rest": [
+     90,
+     150
+    ]
+   },
+   {
+    "name": "Dumbbell Shrug",
+    "sets": 2,
+    "reps": "10-15",
+    "rpes": [
+     9,
+     9
+    ],
+    "rpe": "9",
+    "weight": null,
+    "note": "50 lb a hand. Straight up, 1-sec squeeze, no rolling",
     "rest": [
      90,
      150
@@ -153,25 +167,8 @@
      9
     ],
     "rpe": "8-9",
-    "weight": 30,
+    "weight": null,
     "note": "Crossover, swap which arm is on top each set · both arms, alternate which arm crosses on top each set",
-    "rest": [
-     90,
-     150
-    ],
-    "superset": "pullA-delt-trap"
-   },
-   {
-    "name": "Dumbbell Shrug",
-    "sets": 2,
-    "reps": "10-15",
-    "rpes": [
-     9,
-     9
-    ],
-    "rpe": "9",
-    "weight": 50,
-    "note": "50 lb a hand. Straight up, 1-sec squeeze, no rolling",
     "rest": [
      90,
      150
@@ -187,7 +184,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": 30,
+    "weight": null,
     "note": "30 lb a hand, 45 degree bench, arms behind torso",
     "rest": [
      120,
@@ -204,7 +201,7 @@
      10
     ],
     "rpe": "9-10",
-    "weight": 30,
+    "weight": null,
     "note": "Low pulley, D-handle, elbow pinned · single arm, alternate L/R each set",
     "rest": [
      90,
@@ -224,7 +221,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 75,
+    "weight": null,
     "note": "Heels elevated on plates, full depth",
     "rest": [
      180,
@@ -242,7 +239,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 25,
+    "weight": null,
     "note": "25 lb a hand. Upright torso, long stride · single arm, alternate L/R each set",
     "rest": [
      120,
@@ -259,7 +256,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": 70,
+    "weight": null,
     "note": "Load cut from 85, which was failure at 9 reps",
     "rest": [
      90,
@@ -276,7 +273,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 100,
+    "weight": null,
     "note": "Seated, not lying. Hip flexion means a longer hamstring",
     "rest": [
      120,
@@ -294,13 +291,12 @@
      10
     ],
     "rpe": "8-10",
-    "weight": 35,
+    "weight": null,
     "note": "Knee straight for gastrocnemius. 2-sec bottom pause",
     "rest": [
      90,
      150
-    ],
-    "superset": "legsA-calf-ab"
+    ]
    },
    {
     "name": "Cable Ab Crunch",
@@ -311,7 +307,7 @@
      10
     ],
     "rpe": "9-10",
-    "weight": 150,
+    "weight": null,
     "note": "Round the spine against the load",
     "rest": [
      90,
@@ -331,7 +327,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 95,
+    "weight": null,
     "note": "25 lb bar + 35 a side, 30 degrees",
     "rest": [
      180,
@@ -364,7 +360,7 @@
      9
     ],
     "rpe": "9",
-    "weight": 40,
+    "weight": null,
     "note": "40 lb a hand. Accessory now, not max effort. Deep stretch, no lockout",
     "rest": [
      120,
@@ -381,7 +377,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 45,
+    "weight": null,
     "note": "25 lb bar + 10 a side",
     "rest": [
      120,
@@ -403,9 +399,7 @@
     "rest": [
      90,
      150
-    ],
-    "superset": "pushB-delt-tri",
-    "calibrate": 15
+    ]
    },
    {
     "name": "Overhead Cable Extension (V-bar)",
@@ -422,8 +416,7 @@
     "rest": [
      90,
      150
-    ],
-    "calibrate": 75
+    ]
    }
   ],
   "pullB": [
@@ -456,7 +449,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 50,
+    "weight": null,
     "note": "Pull to hip, shoulder blade travels forward at the bottom · single arm, alternate L/R each set",
     "rest": [
      120,
@@ -472,7 +465,7 @@
      9
     ],
     "rpe": "9",
-    "weight": 50,
+    "weight": null,
     "note": "Kneeling, full overhead reach, slight lean away · single arm, alternate L/R each set",
     "rest": [
      90,
@@ -489,13 +482,12 @@
      9
     ],
     "rpe": "8-9",
-    "weight": 20,
+    "weight": null,
     "note": "Bilateral, one D-handle a tower at eye height. Pull toward the ears, rotate knuckles back",
     "rest": [
      90,
      150
-    ],
-    "superset": "pullB-face-curl"
+    ]
    },
    {
     "name": "Preacher Curl",
@@ -507,7 +499,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": 30,
+    "weight": null,
     "note": "No preacher bench here: set the adjustable bench to about 75 degrees, stand behind it, drape the upper arm over the top pad · single arm, alternate L/R each set",
     "rest": [
      120,
@@ -525,7 +517,7 @@
      10
     ],
     "rpe": "8-10",
-    "weight": 25,
+    "weight": null,
     "note": "Cable low and behind, elbow behind torso for a full stretch",
     "rest": [
      90,
@@ -546,7 +538,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 50,
+    "weight": null,
     "note": "50 lb a hand. Hips back, stop when the hamstrings stop lengthening. Straps ok",
     "rest": [
      180,
@@ -563,7 +555,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 115,
+    "weight": null,
     "note": "Chin tucked, 1-sec squeeze at lockout",
     "rest": [
      120,
@@ -580,7 +572,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": 75,
+    "weight": null,
     "note": "Same machine as Legs A, run lighter and higher-rep",
     "rest": [
      90,
@@ -603,7 +595,6 @@
      90,
      150
     ],
-    "superset": "legsB-hyper-calf",
     "rampIn": 2
    },
    {
@@ -623,7 +614,6 @@
      90,
      150
     ],
-    "calibrate": 45,
     "rampIn": 2
    },
    {
@@ -645,12 +635,13 @@
   ],
   "finisher": []
  },
- "pointer": 3,
+ "pointer": 4,
  "cycleStart": 1785384000000,
  "cycleDone": [
   0,
   1,
-  2
+  2,
+  3
  ],
  "restDays": [],
  "restLog": [
@@ -660,6 +651,8 @@
  "restDeleted": [
   "2026-07-31"
  ],
+ "restAuto": [],
+ "restExtra": [],
  "lastCycle": {
   "start": 1784779200000,
   "end": 1785382434328
@@ -833,6 +826,12 @@
   "2026-08-03": {
    "sleep": "8",
    "energy": "5"
+  },
+  "2026-08-04": {
+   "sleep": ""
+  },
+  "2026-08-06": {
+   "energy": "6"
   }
  },
  "exAliases": {},
@@ -856,9 +855,10 @@
    ]
   },
   "dumbbell lateral raise": {
-   "n": 0,
+   "n": 1,
    "dates": [
-    "2026-08-02"
+    "2026-08-02",
+    "2026-08-06"
    ]
   },
   "overhead cable tricep extension": {
@@ -944,6 +944,36 @@
    "dates": [
     "2026-08-04"
    ]
+  },
+  "incline smith machine bench press": {
+   "n": 0,
+   "dates": [
+    "2026-08-06"
+   ]
+  },
+  "weighted chest dip": {
+   "n": 0,
+   "dates": [
+    "2026-08-06"
+   ]
+  },
+  "flat dumbbell bench press": {
+   "n": 0,
+   "dates": [
+    "2026-08-06"
+   ]
+  },
+  "smith machine shoulder press": {
+   "n": 1,
+   "dates": [
+    "2026-08-06"
+   ]
+  },
+  "overhead cable extension v-bar": {
+   "n": 0,
+   "dates": [
+    "2026-08-06"
+   ]
   }
  },
  "deload": null,
@@ -1004,6 +1034,31 @@
     "145 lb → 145 lb"
    ],
    "note": "Double progression: last set cleared the top of the rep range at target RPE."
+  },
+  {
+   "at": 1785893604574,
+   "date": "2026-08-04",
+   "day": null,
+   "kind": "weight",
+   "name": "Standing Calf Raise (Smith)",
+   "changes": [
+    "35 lb → 45 lb"
+   ],
+   "note": "Double progression: last set cleared the top of the rep range at target RPE."
+  },
+  {
+   "at": 1785956250605,
+   "date": "2026-08-05",
+   "day": null,
+   "kind": "programme",
+   "name": "Programme v3.4",
+   "changes": [
+    "6 superset pairings removed, straight sets throughout",
+    "Prescribed loads cleared from 28 exercises; the log is now the only source",
+    "Pull A: shrug moved ahead of the rear delt fly",
+    "Hard rest ceiling of 4:00, no exceptions"
+   ],
+   "note": "Sets, reps and RPE targets are unchanged at 108 sets a cycle. Your logged sessions, loads and rest days were left untouched."
   }
  ],
  "sessions": [
@@ -7737,7 +7792,485 @@
     "when": 1785893563645,
     "v": 2
    }
+  },
+  {
+   "id": "msi5k8a3oh8k0",
+   "workoutId": "pushB",
+   "date": "2026-08-06",
+   "startedAt": 1786059248619,
+   "finishedAt": 1786064072393,
+   "entries": [
+    {
+     "name": "Incline Smith Machine Bench Press",
+     "reps": "6-10",
+     "rpe": "7-9",
+     "note": "25 lb bar + 35 a side, 30 degrees",
+     "rpes": [
+      7,
+      8,
+      8,
+      9
+     ],
+     "warm": "full",
+     "rest": [
+      180,
+      240
+     ],
+     "sets": [
+      {
+       "weight": "35",
+       "reps": "8",
+       "rpe": "7",
+       "done": true,
+       "rest": 169
+      },
+      {
+       "weight": "35",
+       "reps": "9",
+       "rpe": "8",
+       "done": true,
+       "pr": "REP PR",
+       "rest": 179
+      },
+      {
+       "weight": "35",
+       "reps": "9",
+       "rpe": "8.5",
+       "done": true,
+       "rest": 165
+      },
+      {
+       "weight": "35",
+       "reps": "9",
+       "rpe": "9",
+       "done": true,
+       "rest": 191
+      }
+     ]
+    },
+    {
+     "name": "Weighted Chest Dips",
+     "reps": "8-12",
+     "rpe": "7-9",
+     "note": "Bodyweight to start. Forward lean, elbows out, full depth",
+     "rpes": [
+      7,
+      8,
+      9
+     ],
+     "warm": "light",
+     "rest": [
+      120,
+      180
+     ],
+     "sets": [
+      {
+       "weight": "",
+       "reps": "9",
+       "rpe": "7.5",
+       "done": true,
+       "rest": 190
+      },
+      {
+       "weight": "",
+       "reps": "10",
+       "rpe": "8.5",
+       "done": true,
+       "pr": "REP PR",
+       "rest": 273
+      },
+      {
+       "weight": "",
+       "reps": "9",
+       "rpe": "10",
+       "done": true,
+       "rest": 227
+      }
+     ]
+    },
+    {
+     "name": "Flat Dumbbell Bench Press",
+     "reps": "10-15",
+     "rpe": "9",
+     "note": "40 lb a hand. Accessory now, not max effort. Deep stretch, no lockout",
+     "rpes": [
+      9,
+      9
+     ],
+     "rest": [
+      120,
+      180
+     ],
+     "sets": [
+      {
+       "weight": "40",
+       "reps": "8",
+       "rpe": "10",
+       "done": true,
+       "rest": 207
+      },
+      {
+       "weight": "40",
+       "reps": "8",
+       "rpe": "9",
+       "done": true,
+       "rest": 185
+      }
+     ]
+    },
+    {
+     "name": "Smith Machine Shoulder Press",
+     "reps": "6-10",
+     "rpe": "7-9",
+     "note": "25 lb bar + 10 a side",
+     "rpes": [
+      7,
+      8,
+      9
+     ],
+     "rest": [
+      120,
+      180
+     ],
+     "sets": [
+      {
+       "weight": "25",
+       "reps": "7",
+       "rpe": "7.5",
+       "done": true,
+       "rest": 127
+      },
+      {
+       "weight": "25",
+       "reps": "9",
+       "rpe": "8.5",
+       "done": true,
+       "rest": 208
+      },
+      {
+       "weight": "25",
+       "reps": "9",
+       "rpe": "9",
+       "done": true,
+       "rest": 184
+      }
+     ]
+    },
+    {
+     "name": "Dumbbell Lateral Raise",
+     "reps": "12-20",
+     "rpe": "8-10",
+     "note": "Both dumbbells together, match Push A",
+     "rpes": [
+      8,
+      9,
+      10
+     ],
+     "rest": [
+      90,
+      150
+     ],
+     "sets": [
+      {
+       "weight": "12",
+       "reps": "12",
+       "rpe": "8",
+       "done": true,
+       "rest": 158
+      },
+      {
+       "weight": "12",
+       "reps": "13",
+       "rpe": "9",
+       "done": true,
+       "rest": 145
+      },
+      {
+       "weight": "12",
+       "reps": "13",
+       "rpe": "10",
+       "done": true,
+       "rest": 267
+      }
+     ]
+    },
+    {
+     "name": "Overhead Cable Extension (V-bar)",
+     "reps": "10-14",
+     "rpe": "8-9",
+     "note": "Bilateral, V-handle. Different implement to Push A's straight bar. Elbows high and close",
+     "rpes": [
+      8,
+      9,
+      9
+     ],
+     "rest": [
+      90,
+      150
+     ],
+     "sets": [
+      {
+       "weight": "80",
+       "reps": "11",
+       "rpe": "7.5",
+       "done": true,
+       "rest": 98
+      },
+      {
+       "weight": "80",
+       "reps": "11",
+       "rpe": "8.5",
+       "done": true,
+       "rest": 206
+      },
+      {
+       "weight": "80",
+       "reps": "7",
+       "rpe": "9.5",
+       "done": true,
+       "why": {
+        "code": "fatigue",
+        "note": "",
+        "at": 1786064059159,
+        "missBy": 3
+       }
+      }
+     ],
+     "whyAsked": true
+    }
+   ],
+   "note": "Still felt a bit fatigued and I was tired",
+   "feel": 4,
+   "progression": [
+    {
+     "name": "Incline Smith Machine Bench Press",
+     "kind": "hold",
+     "msg": "Need 10 on the last set to move up",
+     "sub": "Last set was 9 reps at 35 lb. 1 more and the load goes up 10 lb."
+    },
+    {
+     "name": "Weighted Chest Dips",
+     "kind": "hold",
+     "msg": "Need 12 on the last set to move up",
+     "sub": "Last set was 9 reps at bodyweight. 3 more and the load goes up 5 lb."
+    },
+    {
+     "name": "Flat Dumbbell Bench Press",
+     "kind": "hold",
+     "msg": "Need 15 on the last set to move up",
+     "sub": "Last set was 8 reps at 40 lb. 7 more and the load goes up 5 lb."
+    },
+    {
+     "name": "Smith Machine Shoulder Press",
+     "kind": "hold",
+     "msg": "Need 10 on the last set to move up",
+     "sub": "Last set was 9 reps at 25 lb. 1 more and the load goes up 10 lb."
+    },
+    {
+     "name": "Dumbbell Lateral Raise",
+     "kind": "hold",
+     "msg": "Need 20 on the last set to move up",
+     "sub": "Last set was 13 reps at 12 lb. 7 more and the load goes up 2.5 lb."
+    },
+    {
+     "name": "Overhead Cable Extension (V-bar)",
+     "kind": "hold",
+     "msg": "Need 14 on the last set to move up",
+     "sub": "Last set was 7 reps at 80 lb. 7 more and the load goes up 5 lb."
+    }
+   ],
+   "quality": {
+    "total": 86,
+    "max": 100,
+    "pct": 0.862,
+    "grade": "B",
+    "sections": [
+     {
+      "key": "completion",
+      "label": "Completion",
+      "max": 14,
+      "pts": 14,
+      "pct": 1,
+      "grade": "A+",
+      "why": [
+       "18 working sets logged against 18 planned (100%).",
+       "Everything on the card got done."
+      ],
+      "tip": null,
+      "ex": null
+     },
+     {
+      "key": "overload",
+      "label": "Progressive overload",
+      "max": 20,
+      "pts": 10,
+      "pct": 0.5,
+      "grade": "F",
+      "why": [
+       "2 of 4 lifts went up, 0 held, 2 went down.",
+       "Personal records today: Incline Smith Machine Bench Press, Weighted Chest Dips.",
+       "Up: Incline Smith Machine Bench Press, Weighted Chest Dips.",
+       "Down: Smith Machine Shoulder Press (35→33 est. 1RM), Dumbbell Lateral Raise (20→17 est. 1RM).",
+       "On Smith Machine Shoulder Press: the comparison comes from a shoulders session rather than the same rotation day, and it ran 3 places later in the session than last time.",
+       "On Dumbbell Lateral Raise: the comparison comes from a push a session rather than the same rotation day."
+      ],
+      "tip": "Most things moved, but Smith Machine Shoulder Press and Dumbbell Lateral Raise went backwards. If that keeps happening, try moving Dumbbell Lateral Raise earlier, while you're still fresh.",
+      "ex": "Dumbbell Lateral Raise"
+     },
+     {
+      "key": "intensity",
+      "label": "Effective intensity",
+      "max": 16,
+      "pts": 15.6,
+      "pct": 0.9722222222222222,
+      "grade": "A+",
+      "why": [
+       "16 of 18 sets hit their prescribed RPE target (within 0.5).",
+       "2 sets went harder than prescribed, mostly Weighted Chest Dips. Training past the target costs recovery this plan has already budgeted.",
+       "Average RPE 8.6 across 18 scored sets."
+      ],
+      "tip": null,
+      "ex": "Weighted Chest Dips"
+     },
+     {
+      "key": "rest",
+      "label": "Rest discipline",
+      "max": 12,
+      "pts": 10.3,
+      "pct": 0.8557679738562091,
+      "grade": "B",
+      "why": [
+       "4 of 17 timed rests sat inside the window that set's load called for.",
+       "2 rests ran well past the window, which stretches the session without adding stimulus.",
+       "2 rests broke the 4:00 ceiling outright. That is the one rest rule with no exceptions.",
+       "Set mix: 4 heavy, 8 compound, 5 isolation.",
+       "1 of 18 sets weren't timed, so this is graded on the ones that were."
+      ],
+      "tip": "Nothing past four minutes buys you anything. Set the phone down, count the clock, and start the next set.",
+      "ex": null
+     },
+     {
+      "key": "reprange",
+      "label": "Rep-range adherence",
+      "max": 10,
+      "pts": 9.1,
+      "pct": 0.9083333333333334,
+      "grade": "A−",
+      "why": [
+       "15 of 18 sets finished inside their prescribed rep range.",
+       "3 sets fell short (mostly Flat Dumbbell Bench Press), so the load is likely too heavy for that range."
+      ],
+      "tip": "Dropping below the range means the load is winning. Come down slightly and earn the reps back.",
+      "ex": "Flat Dumbbell Bench Press"
+     },
+     {
+      "key": "fatigue",
+      "label": "Fatigue management",
+      "max": 10,
+      "pts": 10,
+      "pct": 1,
+      "grade": "A+",
+      "why": [
+       "Reps fell -2% on average from first set to last at the same load. Up to about 25% is normal.",
+       "Steep drop-off on Overhead Cable Extension (V-bar) (11→7)."
+      ],
+      "tip": "A collapse like that is nearly always too little rest or too heavy an opening set. Rest longer, or start about 5 lb lighter and hold the reps.",
+      "ex": "Overhead Cable Extension (V-bar)"
+     },
+     {
+      "key": "efficiency",
+      "label": "Session efficiency",
+      "max": 8,
+      "pts": 7.2,
+      "pct": 0.8958798925885739,
+      "grade": "B+",
+      "why": [
+       "80 minutes for 18 working sets, 13.4 sets per hour.",
+       "Long session. Past about 80 minutes, focus and set quality tend to fall off."
+      ],
+      "tip": null,
+      "ex": null
+     },
+     {
+      "key": "logquality",
+      "label": "Log quality",
+      "max": 10,
+      "pts": 10,
+      "pct": 1,
+      "grade": "A+",
+      "why": [
+       "Captured: RPE logged on 100% of sets, rest timed on most sets, session feel rated, session note written, daily check-in filled in.",
+       "This is what makes every other section, and your Body map, accurate rather than guesswork."
+      ],
+      "tip": null,
+      "ex": null
+     }
+    ],
+    "skipped": [],
+    "prs": [
+     {
+      "name": "Incline Smith Machine Bench Press",
+      "set": 2,
+      "kind": "REP PR",
+      "weight": "35",
+      "reps": "9"
+     },
+     {
+      "name": "Weighted Chest Dips",
+      "set": 2,
+      "kind": "REP PR",
+      "weight": "",
+      "reps": "10"
+     }
+    ],
+    "flags": [
+     {
+      "name": "Overhead Cable Extension (V-bar)",
+      "set": 3,
+      "code": "fatigue",
+      "note": "",
+      "at": 1786064059159,
+      "missBy": 3
+     }
+    ],
+    "advice": [
+     {
+      "key": "overload",
+      "label": "Progressive overload",
+      "text": "Most things moved, but Smith Machine Shoulder Press and Dumbbell Lateral Raise went backwards. If that keeps happening, try moving Dumbbell Lateral Raise earlier, while you're still fresh.",
+      "ex": "Dumbbell Lateral Raise",
+      "lost": 10,
+      "na": false
+     },
+     {
+      "key": "rest",
+      "label": "Rest discipline",
+      "text": "Nothing past four minutes buys you anything. Set the phone down, count the clock, and start the next set.",
+      "ex": null,
+      "lost": 1.6999999999999993,
+      "na": false
+     },
+     {
+      "key": "reprange",
+      "label": "Rep-range adherence",
+      "text": "Dropping below the range means the load is winning. Come down slightly and earn the reps back.",
+      "ex": "Flat Dumbbell Bench Press",
+      "lost": 0.9000000000000004,
+      "na": false
+     },
+     {
+      "key": "fatigue",
+      "label": "Fatigue management",
+      "text": "A collapse like that is nearly always too little rest or too heavy an opening set. Rest longer, or start about 5 lb lighter and hold the reps.",
+      "ex": "Overhead Cable Extension (V-bar)",
+      "lost": 0,
+      "na": false
+     }
+    ],
+    "when": 1786064072413,
+    "v": 2
+   }
   }
  ],
- "savedAt": 1785893563646
+ "savedAt": 1786064072414
 }
