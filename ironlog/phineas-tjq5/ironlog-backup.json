@@ -12,7 +12,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 115,
     "note": "25 lb bar + 45 a side. Touch chest, no bounce",
     "rest": [
      180,
@@ -29,7 +29,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 35,
     "note": "35 lb a hand, 30 degree bench",
     "rest": [
      120,
@@ -46,7 +46,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": null,
+    "weight": 45,
     "note": "Hold the stretch behind the torso line",
     "rest": [
      90,
@@ -68,7 +68,9 @@
     "rest": [
      90,
      150
-    ]
+    ],
+    "superset": "pushA-delt-tri",
+    "calibrate": 15
    },
    {
     "name": "Overhead Cable Triceps Extension",
@@ -80,7 +82,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": null,
+    "weight": 90,
     "note": "Straight bar behind head, elbows high and close",
     "rest": [
      120,
@@ -100,7 +102,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 140,
     "note": "Lower back stays out of it",
     "rest": [
      180,
@@ -117,7 +119,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 130,
     "note": "Neutral or slightly wide grip",
     "rest": [
      120,
@@ -134,24 +136,8 @@
      9
     ],
     "rpe": "8-9",
-    "weight": null,
+    "weight": 75,
     "note": "Straight arms, hinged at hip, shoulders fully overhead",
-    "rest": [
-     90,
-     150
-    ]
-   },
-   {
-    "name": "Dumbbell Shrug",
-    "sets": 2,
-    "reps": "10-15",
-    "rpes": [
-     9,
-     9
-    ],
-    "rpe": "9",
-    "weight": null,
-    "note": "50 lb a hand. Straight up, 1-sec squeeze, no rolling",
     "rest": [
      90,
      150
@@ -167,8 +153,25 @@
      9
     ],
     "rpe": "8-9",
-    "weight": null,
+    "weight": 30,
     "note": "Crossover, swap which arm is on top each set · both arms, alternate which arm crosses on top each set",
+    "rest": [
+     90,
+     150
+    ],
+    "superset": "pullA-delt-trap"
+   },
+   {
+    "name": "Dumbbell Shrug",
+    "sets": 2,
+    "reps": "10-15",
+    "rpes": [
+     9,
+     9
+    ],
+    "rpe": "9",
+    "weight": 50,
+    "note": "50 lb a hand. Straight up, 1-sec squeeze, no rolling",
     "rest": [
      90,
      150
@@ -184,7 +187,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": null,
+    "weight": 30,
     "note": "30 lb a hand, 45 degree bench, arms behind torso",
     "rest": [
      120,
@@ -201,7 +204,7 @@
      10
     ],
     "rpe": "9-10",
-    "weight": null,
+    "weight": 30,
     "note": "Low pulley, D-handle, elbow pinned · single arm, alternate L/R each set",
     "rest": [
      90,
@@ -221,7 +224,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 75,
     "note": "Heels elevated on plates, full depth",
     "rest": [
      180,
@@ -239,7 +242,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 25,
     "note": "25 lb a hand. Upright torso, long stride · single arm, alternate L/R each set",
     "rest": [
      120,
@@ -256,7 +259,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": null,
+    "weight": 70,
     "note": "Load cut from 85, which was failure at 9 reps",
     "rest": [
      90,
@@ -273,7 +276,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 100,
     "note": "Seated, not lying. Hip flexion means a longer hamstring",
     "rest": [
      120,
@@ -291,12 +294,13 @@
      10
     ],
     "rpe": "8-10",
-    "weight": null,
+    "weight": 35,
     "note": "Knee straight for gastrocnemius. 2-sec bottom pause",
     "rest": [
      90,
      150
-    ]
+    ],
+    "superset": "legsA-calf-ab"
    },
    {
     "name": "Cable Ab Crunch",
@@ -307,7 +311,7 @@
      10
     ],
     "rpe": "9-10",
-    "weight": null,
+    "weight": 150,
     "note": "Round the spine against the load",
     "rest": [
      90,
@@ -327,7 +331,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 95,
     "note": "25 lb bar + 35 a side, 30 degrees",
     "rest": [
      180,
@@ -360,7 +364,7 @@
      9
     ],
     "rpe": "9",
-    "weight": null,
+    "weight": 40,
     "note": "40 lb a hand. Accessory now, not max effort. Deep stretch, no lockout",
     "rest": [
      120,
@@ -377,7 +381,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 45,
     "note": "25 lb bar + 10 a side",
     "rest": [
      120,
@@ -399,7 +403,9 @@
     "rest": [
      90,
      150
-    ]
+    ],
+    "superset": "pushB-delt-tri",
+    "calibrate": 15
    },
    {
     "name": "Overhead Cable Extension (V-bar)",
@@ -416,7 +422,8 @@
     "rest": [
      90,
      150
-    ]
+    ],
+    "calibrate": 75
    }
   ],
   "pullB": [
@@ -449,7 +456,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 50,
     "note": "Pull to hip, shoulder blade travels forward at the bottom · single arm, alternate L/R each set",
     "rest": [
      120,
@@ -465,7 +472,7 @@
      9
     ],
     "rpe": "9",
-    "weight": null,
+    "weight": 50,
     "note": "Kneeling, full overhead reach, slight lean away · single arm, alternate L/R each set",
     "rest": [
      90,
@@ -482,12 +489,13 @@
      9
     ],
     "rpe": "8-9",
-    "weight": null,
+    "weight": 20,
     "note": "Bilateral, one D-handle a tower at eye height. Pull toward the ears, rotate knuckles back",
     "rest": [
      90,
      150
-    ]
+    ],
+    "superset": "pullB-face-curl"
    },
    {
     "name": "Preacher Curl",
@@ -499,7 +507,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": null,
+    "weight": 30,
     "note": "No preacher bench here: set the adjustable bench to about 75 degrees, stand behind it, drape the upper arm over the top pad · single arm, alternate L/R each set",
     "rest": [
      120,
@@ -517,7 +525,7 @@
      10
     ],
     "rpe": "8-10",
-    "weight": null,
+    "weight": 25,
     "note": "Cable low and behind, elbow behind torso for a full stretch",
     "rest": [
      90,
@@ -538,7 +546,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 50,
     "note": "50 lb a hand. Hips back, stop when the hamstrings stop lengthening. Straps ok",
     "rest": [
      180,
@@ -555,7 +563,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": null,
+    "weight": 115,
     "note": "Chin tucked, 1-sec squeeze at lockout",
     "rest": [
      120,
@@ -572,7 +580,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": null,
+    "weight": 75,
     "note": "Same machine as Legs A, run lighter and higher-rep",
     "rest": [
      90,
@@ -595,6 +603,7 @@
      90,
      150
     ],
+    "superset": "legsB-hyper-calf",
     "rampIn": 2
    },
    {
@@ -614,6 +623,7 @@
      90,
      150
     ],
+    "calibrate": 45,
     "rampIn": 2
    },
    {
@@ -635,13 +645,14 @@
   ],
   "finisher": []
  },
- "pointer": 4,
+ "pointer": 5,
  "cycleStart": 1785384000000,
  "cycleDone": [
   0,
   1,
   2,
-  3
+  3,
+  4
  ],
  "restDays": [],
  "restLog": [
@@ -651,8 +662,6 @@
  "restDeleted": [
   "2026-07-31"
  ],
- "restAuto": [],
- "restExtra": [],
  "lastCycle": {
   "start": 1784779200000,
   "end": 1785382434328
@@ -832,6 +841,10 @@
   },
   "2026-08-06": {
    "energy": "6"
+  },
+  "2026-08-18": {
+   "sleep": "8",
+   "energy": "7"
   }
  },
  "exAliases": {},
@@ -973,6 +986,42 @@
    "n": 0,
    "dates": [
     "2026-08-06"
+   ]
+  },
+  "weighted pull-up": {
+   "n": 0,
+   "dates": [
+    "2026-08-18"
+   ]
+  },
+  "single-arm dumbbell row": {
+   "n": 0,
+   "dates": [
+    "2026-08-18"
+   ]
+  },
+  "single-arm cable pulldown": {
+   "n": 0,
+   "dates": [
+    "2026-08-18"
+   ]
+  },
+  "cable face pull two d-handles": {
+   "n": 0,
+   "dates": [
+    "2026-08-18"
+   ]
+  },
+  "preacher curl": {
+   "n": 1,
+   "dates": [
+    "2026-08-18"
+   ]
+  },
+  "bayesian cable curl": {
+   "n": 0,
+   "dates": [
+    "2026-08-18"
    ]
   }
  },
@@ -8270,7 +8319,542 @@
     "when": 1786064072413,
     "v": 2
    }
+  },
+  {
+   "id": "msz6tuwsv2hzq",
+   "workoutId": "pullB",
+   "date": "2026-08-18",
+   "startedAt": 1787089302463,
+   "finishedAt": 1787093246837,
+   "entries": [
+    {
+     "name": "Weighted Pull-Up",
+     "reps": "5-10",
+     "rpe": "7-9",
+     "note": "Bodyweight to start. Dead hang, chest to bar",
+     "rpes": [
+      7,
+      8,
+      8,
+      9
+     ],
+     "warm": "full",
+     "rest": [
+      180,
+      240
+     ],
+     "sets": [
+      {
+       "weight": "",
+       "reps": "6",
+       "rpe": "7.5",
+       "done": true,
+       "rest": 133
+      },
+      {
+       "weight": "",
+       "reps": "6",
+       "rpe": "8.5",
+       "done": true,
+       "rest": 124
+      },
+      {
+       "weight": "",
+       "reps": "4",
+       "rpe": "9",
+       "done": true,
+       "rest": 150
+      },
+      {
+       "weight": "",
+       "reps": "4",
+       "rpe": "9.5",
+       "done": true,
+       "rest": 141
+      }
+     ]
+    },
+    {
+     "name": "Single-Arm Dumbbell Row",
+     "reps": "8-12",
+     "rpe": "7-9",
+     "note": "Pull to hip, shoulder blade travels forward at the bottom · single arm, alternate L/R each set",
+     "rpes": [
+      7,
+      8,
+      9
+     ],
+     "warm": "light",
+     "planWeight": 50,
+     "rest": [
+      120,
+      180
+     ],
+     "altStyle": "side",
+     "startSide": "R",
+     "sets": [
+      {
+       "weight": "25",
+       "reps": "14",
+       "rpe": "6",
+       "done": true,
+       "rest": 205
+      },
+      {
+       "weight": "30",
+       "reps": "17",
+       "rpe": "6",
+       "done": true,
+       "pr": "WEIGHT PR",
+       "rest": 87
+      },
+      {
+       "weight": "35",
+       "reps": "18",
+       "rpe": "8.5",
+       "done": true,
+       "pr": "WEIGHT PR",
+       "rest": 209
+      }
+     ]
+    },
+    {
+     "name": "Single-Arm Cable Pulldown",
+     "reps": "12-15",
+     "rpe": "9",
+     "note": "Kneeling, full overhead reach, slight lean away · single arm, alternate L/R each set",
+     "rpes": [
+      9,
+      9
+     ],
+     "planWeight": 50,
+     "rest": [
+      90,
+      150
+     ],
+     "altStyle": "side",
+     "startSide": "R",
+     "sets": [
+      {
+       "weight": "50",
+       "reps": "15",
+       "rpe": "6.5",
+       "done": true,
+       "rest": 110
+      },
+      {
+       "weight": "70",
+       "reps": "17",
+       "rpe": "8.5",
+       "done": true,
+       "pr": "WEIGHT PR",
+       "rest": 294
+      }
+     ]
+    },
+    {
+     "name": "Cable Face Pull (two D-handles)",
+     "reps": "15-20",
+     "rpe": "8-9",
+     "note": "Bilateral, one D-handle a tower at eye height. Pull toward the ears, rotate knuckles back",
+     "rpes": [
+      8,
+      9,
+      9
+     ],
+     "planWeight": 20,
+     "rest": [
+      90,
+      150
+     ],
+     "superset": "pullB-face-curl",
+     "sets": [
+      {
+       "weight": "70",
+       "reps": "20",
+       "rpe": "7.5",
+       "done": true
+      },
+      {
+       "weight": "80",
+       "reps": "21",
+       "rpe": "9",
+       "done": true,
+       "pr": "WEIGHT PR"
+      },
+      {
+       "weight": "90",
+       "reps": "21",
+       "rpe": "9",
+       "done": true,
+       "pr": "WEIGHT PR"
+      }
+     ]
+    },
+    {
+     "name": "Preacher Curl",
+     "reps": "8-12",
+     "rpe": "8-9",
+     "note": "No preacher bench here: set the adjustable bench to about 75 degrees, stand behind it, drape the upper arm over the top pad · single arm, alternate L/R each set",
+     "rpes": [
+      8,
+      9,
+      9
+     ],
+     "planWeight": 30,
+     "rest": [
+      120,
+      180
+     ],
+     "altStyle": "side",
+     "startSide": "R",
+     "sets": [
+      {
+       "weight": "25",
+       "reps": "7",
+       "rpe": "8",
+       "done": true,
+       "rest": 136
+      },
+      {
+       "weight": "25",
+       "reps": "5",
+       "rpe": "10",
+       "done": true,
+       "why": {
+        "code": "fatigue",
+        "note": "",
+        "at": 1787092056229,
+        "missBy": 3
+       },
+       "rest": 207
+      },
+      {
+       "weight": "25",
+       "reps": "5",
+       "rpe": "10",
+       "done": true,
+       "rest": 249
+      }
+     ],
+     "whyAsked": true
+    },
+    {
+     "name": "Bayesian Cable Curl",
+     "reps": "10-15",
+     "rpe": "8-10",
+     "note": "Cable low and behind, elbow behind torso for a full stretch",
+     "rpes": [
+      8,
+      9,
+      10
+     ],
+     "planWeight": 25,
+     "rest": [
+      90,
+      150
+     ],
+     "sets": [
+      {
+       "weight": "30",
+       "reps": "14",
+       "rpe": "7.5",
+       "done": true,
+       "rest": 102
+      },
+      {
+       "weight": "40",
+       "reps": "8",
+       "rpe": "9.5",
+       "done": true,
+       "pr": "WEIGHT PR",
+       "rest": 213
+      },
+      {
+       "weight": "35",
+       "reps": "9",
+       "rpe": "10",
+       "done": true
+      }
+     ]
+    }
+   ],
+   "note": "",
+   "feel": 4,
+   "progression": [
+    {
+     "name": "Weighted Pull-Up",
+     "kind": "hold",
+     "msg": "Need 10 on the last set to move up",
+     "sub": "Last set was 4 reps at bodyweight. 6 more and the load goes up 5 lb."
+    },
+    {
+     "name": "Single-Arm Dumbbell Row",
+     "kind": "up",
+     "from": 35,
+     "to": 40,
+     "step": {
+      "amount": 5,
+      "unit": "lb a hand",
+      "why": "dumbbell compound"
+     },
+     "msg": "Add weight next time: 35 lb → 40 lb",
+     "sub": "Last set hit 18 reps, the top of 8-12, at RPE 8.5 against a target of 9. Rebuild from 8 reps at the new load."
+    },
+    {
+     "name": "Single-Arm Cable Pulldown",
+     "kind": "up",
+     "from": 70,
+     "to": 75,
+     "step": {
+      "amount": 5,
+      "unit": "lb",
+      "why": "one pin on the stack"
+     },
+     "msg": "Add weight next time: 70 lb → 75 lb",
+     "sub": "Last set hit 17 reps, the top of 12-15, at RPE 8.5 against a target of 9. Rebuild from 12 reps at the new load."
+    },
+    {
+     "name": "Cable Face Pull (two D-handles)",
+     "kind": "up",
+     "from": 90,
+     "to": 95,
+     "step": {
+      "amount": 5,
+      "unit": "lb",
+      "why": "one pin on the stack"
+     },
+     "msg": "Add weight next time: 90 lb → 95 lb",
+     "sub": "Last set hit 21 reps, the top of 15-20, at RPE 9 against a target of 9. Rebuild from 15 reps at the new load."
+    },
+    {
+     "name": "Preacher Curl",
+     "kind": "hold",
+     "msg": "Need 12 on the last set to move up",
+     "sub": "Last set was 5 reps at 25 lb. 7 more and the load goes up 2.5 lb."
+    },
+    {
+     "name": "Bayesian Cable Curl",
+     "kind": "toohard",
+     "detail": {
+      "at": {
+       "w": 40,
+       "reps": 8,
+       "rpe": 9.5,
+       "date": "2026-08-18"
+      },
+      "msg": "25 lb for 10-15 reps is not reachable: you have already hit RPE 9.5 at 40 lb for only 8 reps.",
+      "fix": "Drop to about 20 lb and earn the range back."
+     }
+    }
+   ],
+   "quality": {
+    "total": 86,
+    "max": 100,
+    "pct": 0.863,
+    "grade": "B",
+    "sections": [
+     {
+      "key": "completion",
+      "label": "Completion",
+      "max": 14,
+      "pts": 14,
+      "pct": 1,
+      "grade": "A+",
+      "why": [
+       "18 working sets logged against 18 planned (100%).",
+       "Everything on the card got done."
+      ],
+      "tip": null,
+      "ex": null
+     },
+     {
+      "key": "overload",
+      "label": "Progressive overload",
+      "max": 20,
+      "pts": 16,
+      "pct": 0.8,
+      "grade": "B−",
+      "why": [
+       "4 of 5 lifts went up, 0 held, 1 went down.",
+       "Personal records today: Single-Arm Dumbbell Row, Single-Arm Cable Pulldown, Cable Face Pull (two D-handles), Bayesian Cable Curl.",
+       "Up: Single-Arm Dumbbell Row, Single-Arm Cable Pulldown, Cable Face Pull (two D-handles), Bayesian Cable Curl.",
+       "Down: Preacher Curl (33→31 est. 1RM).",
+       "On Preacher Curl: you logged ran out of gas on it, and the comparison comes from a arms session rather than the same rotation day, and it ran 2 places later in the session than last time."
+      ],
+      "tip": "Most things moved, but Preacher Curl went backwards. If that keeps happening, try moving Preacher Curl earlier, while you're still fresh.",
+      "ex": "Preacher Curl"
+     },
+     {
+      "key": "intensity",
+      "label": "Effective intensity",
+      "max": 16,
+      "pts": 14.1,
+      "pct": 0.8805555555555556,
+      "grade": "B+",
+      "why": [
+       "12 of 18 sets hit their prescribed RPE target (within 0.5).",
+       "3 sets went harder than prescribed, mostly Preacher Curl. Training past the target costs recovery this plan has already budgeted.",
+       "3 sets stopped further from failure than prescribed, mostly Single-Arm Dumbbell Row.",
+       "Average RPE 8.4 across 18 scored sets."
+      ],
+      "tip": null,
+      "ex": "Preacher Curl"
+     },
+     {
+      "key": "rest",
+      "label": "Rest discipline",
+      "max": 12,
+      "pts": 9.5,
+      "pct": 0.7948115079365078,
+      "grade": "C+",
+      "why": [
+       "3 of 14 timed rests sat inside the window that set's load called for.",
+       "1 rest ran well past the window, which stretches the session without adding stimulus.",
+       "Set mix: 4 heavy, 6 compound, 4 isolation.",
+       "4 of 18 sets weren't timed, so this is graded on the ones that were."
+      ],
+      "tip": null,
+      "ex": null
+     },
+     {
+      "key": "reprange",
+      "label": "Rep-range adherence",
+      "max": 10,
+      "pts": 6,
+      "pct": 0.6027777777777779,
+      "grade": "D",
+      "why": [
+       "5 of 18 sets finished inside their prescribed rep range.",
+       "6 sets went over the top of the range (mostly Single-Arm Dumbbell Row), so that load has become too light.",
+       "7 sets fell short (mostly Preacher Curl), so the load is likely too heavy for that range."
+      ],
+      "tip": "Dropping below the range means the load is winning. Come down slightly and earn the reps back.",
+      "ex": "Preacher Curl"
+     },
+     {
+      "key": "fatigue",
+      "label": "Fatigue management",
+      "max": 10,
+      "pts": 10,
+      "pct": 1,
+      "grade": "A+",
+      "why": [
+       "Reps fell 8% on average from first set to last at the same load. Up to about 25% is normal.",
+       "Steep drop-off on Bayesian Cable Curl (14→9)."
+      ],
+      "tip": "A collapse like that is nearly always too little rest or too heavy an opening set. Rest longer, or start about 5 lb lighter and hold the reps.",
+      "ex": "Bayesian Cable Curl"
+     },
+     {
+      "key": "efficiency",
+      "label": "Session efficiency",
+      "max": 8,
+      "pts": 7.7,
+      "pct": 0.9650769425008887,
+      "grade": "A",
+      "why": [
+       "66 minutes for 18 working sets, 16.4 sets per hour.",
+       "Duration sits in the productive 40-80 minute window."
+      ],
+      "tip": null,
+      "ex": null
+     },
+     {
+      "key": "logquality",
+      "label": "Log quality",
+      "max": 10,
+      "pts": 9,
+      "pct": 0.9,
+      "grade": "A−",
+      "why": [
+       "Captured: RPE logged on 100% of sets, rest timed on most sets, session feel rated, daily check-in filled in.",
+       "Missing: no session note.",
+       "This is what makes every other section, and your Body map, accurate rather than guesswork."
+      ],
+      "tip": "Each missing field is a place the analysis has to guess. RPE and rest are the two that matter most.",
+      "ex": null
+     }
+    ],
+    "skipped": [],
+    "prs": [
+     {
+      "name": "Single-Arm Dumbbell Row",
+      "set": 3,
+      "kind": "WEIGHT PR",
+      "weight": "35",
+      "reps": "18"
+     },
+     {
+      "name": "Single-Arm Cable Pulldown",
+      "set": 2,
+      "kind": "WEIGHT PR",
+      "weight": "70",
+      "reps": "17"
+     },
+     {
+      "name": "Cable Face Pull (two D-handles)",
+      "set": 3,
+      "kind": "WEIGHT PR",
+      "weight": "90",
+      "reps": "21"
+     },
+     {
+      "name": "Bayesian Cable Curl",
+      "set": 2,
+      "kind": "WEIGHT PR",
+      "weight": "40",
+      "reps": "8"
+     }
+    ],
+    "flags": [
+     {
+      "name": "Preacher Curl",
+      "set": 2,
+      "code": "fatigue",
+      "note": "",
+      "at": 1787092056229,
+      "missBy": 3
+     }
+    ],
+    "advice": [
+     {
+      "key": "overload",
+      "label": "Progressive overload",
+      "text": "Most things moved, but Preacher Curl went backwards. If that keeps happening, try moving Preacher Curl earlier, while you're still fresh.",
+      "ex": "Preacher Curl",
+      "lost": 4,
+      "na": false
+     },
+     {
+      "key": "reprange",
+      "label": "Rep-range adherence",
+      "text": "Dropping below the range means the load is winning. Come down slightly and earn the reps back.",
+      "ex": "Preacher Curl",
+      "lost": 4,
+      "na": false
+     },
+     {
+      "key": "logquality",
+      "label": "Log quality",
+      "text": "Each missing field is a place the analysis has to guess. RPE and rest are the two that matter most.",
+      "ex": null,
+      "lost": 1,
+      "na": false
+     },
+     {
+      "key": "fatigue",
+      "label": "Fatigue management",
+      "text": "A collapse like that is nearly always too little rest or too heavy an opening set. Rest longer, or start about 5 lb lighter and hold the reps.",
+      "ex": "Bayesian Cable Curl",
+      "lost": 0,
+      "na": false
+     }
+    ],
+    "when": 1787093246856,
+    "v": 2
+   }
   }
  ],
- "savedAt": 1786064072414
+ "savedAt": 1787093246857
 }
