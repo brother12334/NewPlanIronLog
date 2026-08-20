@@ -10393,6 +10393,148 @@ if(S.sync.token && S.sync.gistId){ setSyncStatus("pending"); syncNow(false); }
 document.addEventListener("visibilitychange", ()=>{
   if(document.visibilityState==="visible" && S.sync.token && S.sync.gistId) syncNow(false);
 });
+  
+
+
+function exportSplit(){
+  return {
+    id: "ppl6",
+    name: "Push / Pull / Legs A-B",
+    tag: DAYS.length + " days a cycle",
+    custom: true,
+    days: DAYS.map(function(id){
+      return {id: id, name: dayMeta(id).name, short: dayMeta(id).short};
+    }),
+    /* The layout is what carries the rest days: a newer build counts the "rest" entries
+       to decide how many rest credits a cycle grants, so leaving it out would quietly
+       take this programme from two rests a cycle down to none. */
+    layout: (typeof CYCLE_LAYOUT !== "undefined" && CYCLE_LAYOUT.length)
+              ? CYCLE_LAYOUT.slice()
+              : DAYS.concat(["rest"])
+  };
+}
+
+function payload(){
+  return JSON.stringify({
+    e26: {app:"Element 26", version: APP_VERSION, exportedAt: Date.now(), schema: 2},
+    /* THE SPLIT. The field that makes this file portable at all. */
+    splitId: null,
+    customSplit: exportSplit(),
+    /* `cycleV2` marks the cycle start in this file as a real one. Without it a newer
+       build reads the absence as "this predates the flag", re-derives the start from
+       scratch, lands on today, and opens a cycle you were most of the way through as
+       though you had not begun it. */
+    cycleV2: true,
+    setup: S.setup || null,
+    program: S.program,
+    pointer: S.pointer,
+    cycleStart: S.cycleStart,
+    cycleDone: S.cycleDone,
+    restDays: S.restDays || [],
+    restLog: S.restLog || [],
+    restDeleted: S.restDeleted || [],
+    lastCycle: S.lastCycle || null,
+    lastReview: S.lastReview || null,
+    checkins: S.checkins || {},
+    exAliases: S.exAliases || {},
+    stalls: S.stalls || {},
+    deload: S.deload || null,
+    blockStart: S.blockStart || null,
+    planStart: S.planStart || null,
+    wakeTime: S.wakeTime || null,
+    sleepTarget: S.sleepTarget || null,
+    asymRetired: S.asymRetired || {},
+    asymRetest: S.asymRetest || null,
+    volWindow: S.volWindow || "cycle",
+    askWhy: S.askWhy !== false,
+    viewMode: S.viewMode || "regular",
+    experience: S.experience || null,
+    deleted: (S.deleted || []).slice(-500),
+    planLog: (S.planLog || []).slice(-500),
+    sessions: S.sessions,
+    savedAt: S.savedAt
+  }, null, 1);
+}
+
+/* Reading a file back, for the same reason: files now travel in both directions.
+
+   The old version restored seven fields — program, pointer, cycleStart, checkins,
+   restLog, planLog, sessions — and silently dropped rest days, exercise renames,
+   stalls, deloads, the asymmetry state and the cycle's own checkmarks.
+
+   It also adopted any programme it was handed. This version's rotation is fixed, so a
+   file built on a different split has day keys no screen here can draw. The programme
+   is now only taken when its days match; when they don't, the HISTORY still comes in —
+   that is the part worth keeping — and you are told the plan was left alone.          */
+function importJSON(e){
+  var file = e.target.files[0];
+  e.target.value = "";
+  if(!file) return;
+  var r = new FileReader();
+  r.onload = function(){
+    var d;
+    try{ d = JSON.parse(r.result); }
+    catch(err){ toast("That file isn't readable JSON."); return; }
+    if(!d || typeof d !== "object" || (!Array.isArray(d.sessions) && !d.program)){
+      toast("That isn't an Element 26 backup."); return;
+    }
+
+    var incoming = Array.isArray(d.sessions) ? d.sessions.length : 0;
+    var have = S.sessions.length;
+    if(have && !confirm("Replace this device's " + have + " logged workout" + (have===1?"":"s") +
+                        " with the file's " + incoming + "?\n\nThis cannot be undone.")) return;
+
+    var mine = DAYS.slice().concat("finisher");
+    var prog = (d.program && typeof d.program === "object") ? d.program : null;
+    var theirs = prog ? Object.keys(prog).filter(function(k){ return Array.isArray(prog[k]); }) : [];
+    var foreign = theirs.filter(function(k){ return mine.indexOf(k) < 0; });
+    var takeProgram = !!prog && !foreign.length;
+
+    if(prog && !takeProgram &&
+       !confirm("That file's programme is built on a different split (" +
+                foreign.slice(0,4).join(", ") + (foreign.length>4 ? ", …" : "") + ").\n\n" +
+                "This version only runs Push/Pull/Legs A-B, so the plan here is left as it is. " +
+                "The " + incoming + " logged workout" + (incoming===1?"":"s") +
+                " will still be imported.\n\nGo ahead?")) return;
+
+    if(takeProgram){
+      S.program = prog;
+      if(d.pointer != null) S.pointer = d.pointer;
+      if(d.cycleStart) S.cycleStart = d.cycleStart;
+      if(Array.isArray(d.cycleDone)) S.cycleDone = d.cycleDone;
+      if(d.lastCycle) S.lastCycle = d.lastCycle;
+      if(d.deload !== undefined) S.deload = d.deload;
+      if(d.blockStart) S.blockStart = d.blockStart;
+      if(d.planStart) S.planStart = d.planStart;
+    }
+
+    if(Array.isArray(d.sessions)) S.sessions = d.sessions;
+    ["restDays","restLog","restDeleted","deleted","planLog"].forEach(function(k){
+      if(Array.isArray(d[k])) S[k] = d[k];
+    });
+    ["checkins","exAliases","stalls","asymRetired"].forEach(function(k){
+      if(d[k] && typeof d[k] === "object") S[k] = d[k];
+    });
+    ["lastReview","wakeTime","sleepTarget","asymRetest","volWindow","viewMode","experience","setup"]
+      .forEach(function(k){ if(d[k] !== undefined && d[k] !== null) S[k] = d[k]; });
+    if(typeof d.askWhy === "boolean") S.askWhy = d.askWhy;
+
+    /* Renames must be live before anything compares an exercise name, and the plan may
+       have arrived in an older shape, so migrate() runs before the first render. */
+    USER_ALIASES = S.exAliases || {};
+    invalidateTableOrigin();
+    invalidateMultiDay();
+    migrate();
+    recomputeCycle(false);
+    save(); queueSync(); render();
+    toast(takeProgram
+      ? "Imported " + S.sessions.length + " workouts ✓"
+      : "Imported " + S.sessions.length + " workouts, plan left as it was ✓");
+  };
+  r.onerror = function(){ toast("Couldn't read that file."); };
+  r.readAsText(file);
+}
+
 </script>
 </body>
 </html>
