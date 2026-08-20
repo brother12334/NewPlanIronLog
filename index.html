@@ -321,13 +321,12 @@ h1,h2,h3{font-family:var(--disp);font-weight:600;text-transform:uppercase;letter
    are aiming at and the number you log sit in the same cell. Muted, because it is a
    reference value and the input is the thing you interact with. */
 /* ================= TEMPORARY-RULE BANNERS =================
-   Deload, sleep window, drift and the two expiring rules. All four share a shape: a
+   Deload, sleep window and the two expiring rules. All three share a shape: a
    coloured left edge naming the constraint, the consequence in readable type, and the
    reasoning underneath in grey. They sit above the exercise list because every one of
    them changes what you should do BEFORE the first set, not after. */
 .deload-card{border-left:4px solid var(--back);background:linear-gradient(180deg,rgba(74,130,224,.08),transparent)}
 .sleep-card{border-left:4px solid var(--bad);background:linear-gradient(180deg,rgba(224,82,72,.08),transparent)}
-.drift-card{border-left:4px solid var(--bad);background:linear-gradient(180deg,rgba(224,82,72,.06),transparent)}
 .rule-card{border-left:3px solid var(--acc);background:linear-gradient(180deg,var(--acc-soft),transparent);padding:12px 14px}
 .rule-row{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;color:var(--dim);padding:4px 0}
 .rule-row + .rule-row{border-top:1px solid var(--line);margin-top:4px;padding-top:8px}
@@ -4742,7 +4741,6 @@ function viewToday(){
   </div>`;
   h += deloadBannerHTML();
   h += sleepWindowHTML(wid);
-  h += driftHTML();
   h += asymRetestHTML();
   h += ruleBannerHTML();
   // The one thing worth changing today, taken from the grade of your last session of
@@ -8600,52 +8598,6 @@ function ruleBannerHTML(){
     `<div class="rule-row"><span class="rule-k">${esc(b.k)}</span><span>${esc(b.v)}</span></div>`).join("") + `</div>`;
 }
 
-/* =====================================================================
-   DRIFT GUARD
-
-   The original diagnosis was never "days aren't pinned to the calendar" — it was that
-   muscle groups were going 8 to 11 days between sessions. That is the thing worth
-   catching. With six days plus one rest day, a normal week has every muscle back
-   inside 3-4 days, so 5+ means you have genuinely slipped rather than merely shuffled.
-   ===================================================================== */
-const DRIFT_DAYS = 5;
-function driftReport(){
-  const now = Date.now();
-  const last = {};
-  S.sessions.forEach(s=>{
-    (s.entries || []).forEach(e=>{
-      const mm = musclesFor(e.name);
-      if(!mm) return;
-      const worked = (e.sets || []).some(isWorkingSet);
-      if(!worked) return;
-      Object.keys(mm).forEach(m=>{
-        if(mm[m] < 0.5) return;           // assisting is not training
-        if(!last[m] || s.startedAt > last[m]) last[m] = s.startedAt;
-      });
-    });
-  });
-  const stale = [];
-  MKEYS.forEach(m=>{
-    if(GROUPS[m].optional) return;
-    if(!last[m]) return;                  // never trained is a weak point, not drift
-    const days = (now - last[m]) / DAY_MS;
-    if(days >= DRIFT_DAYS) stale.push({m, days: Math.floor(days)});
-  });
-  return stale.sort((a,b)=>b.days - a.days);
-}
-function driftHTML(){
-  const stale = driftReport();
-  if(!stale.length) return "";
-  const top = stale.slice(0, 4);
-  return `<div class="card drift-card">
-    <div class="fc-k" style="color:var(--bad)">Drifting</div>
-    <div class="fc-do">${top.map(x=>esc(gName(x.m)) + " " + x.days + " days").join(" · ")}${
-      stale.length > 4 ? " and " + (stale.length - 4) + " more" : ""}</div>
-    <div class="fc-sub">On a six-day rotation every muscle should come round inside 3 to 4 days.
-      Anything past ${DRIFT_DAYS} means the rotation has slipped, not just shifted.</div>
-  </div>`;
-}
-
 /* ---------- the banners these rules put on Today ---------- */
 function deloadBannerHTML(){
   if(deloadActive()){
@@ -9544,12 +9496,6 @@ async function gistFetch(path, opts={}){
   }
   return res.json();
 }
-function payload(){
-  return JSON.stringify({program:S.program, pointer:S.pointer, cycleStart:S.cycleStart, cycleDone:S.cycleDone, restDays:S.restDays||[], restLog:S.restLog||[], restDeleted:S.restDeleted||[], lastCycle:S.lastCycle||null, lastReview:S.lastReview||null, checkins:S.checkins||{}, exAliases:S.exAliases||{}, stalls:S.stalls||{}, deload:S.deload||null,
-    blockStart:S.blockStart||null, planStart:S.planStart||null, wakeTime:S.wakeTime||null, sleepTarget:S.sleepTarget||null,
-    asymRetired:S.asymRetired||{}, asymRetest:S.asymRetest||null,
-    volWindow:S.volWindow||"cycle", askWhy:S.askWhy!==false, deleted:(S.deleted||[]).slice(-500), planLog:(S.planLog||[]).slice(-500), sessions:S.sessions, savedAt:S.savedAt}, null, 1);
-}
 async function connectGist(){
   S.sync.token = $("#tokenIn").value.trim();
   S.sync.gistId = $("#gistIn").value.trim();
@@ -10349,28 +10295,6 @@ function exportJSON(){
   a.click();
   URL.revokeObjectURL(a.href);
 }
-function importJSON(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  const r = new FileReader();
-  r.onload = ()=>{
-    try{
-      const d = JSON.parse(r.result);
-      if(!d.program || !Array.isArray(d.sessions)) throw new Error("not an Element 26 file");
-      S.program = d.program;
-      S.pointer = d.pointer||0;
-      if(d.cycleStart) S.cycleStart = d.cycleStart;
-      if(d.checkins) S.checkins = d.checkins;
-      if(Array.isArray(d.restLog)) S.restLog = d.restLog;
-      if(Array.isArray(d.planLog)) S.planLog = d.planLog;
-      S.sessions = d.sessions;
-      recomputeCycle(false);
-      save(); queueSync(); render(); toast("Imported ✓");
-    }catch(err){ toast("Import failed: "+err.message); }
-  };
-  r.readAsText(file);
-  e.target.value = "";
-}
 
 /* ================= BOOT ================= */
 (function(){
@@ -10413,6 +10337,128 @@ function exportSplit(){
               : DAYS.concat(["rest"])
   };
 }
+
+function payload(){
+  return JSON.stringify({
+    e26: {app:"Element 26", version: APP_VERSION, exportedAt: Date.now(), schema: 2},
+    /* THE SPLIT. The field that makes this file portable at all. */
+    splitId: null,
+    customSplit: exportSplit(),
+    /* `cycleV2` marks the cycle start in this file as a real one. Without it a newer
+       build reads the absence as "this predates the flag", re-derives the start from
+       scratch, lands on today, and opens a cycle you were most of the way through as
+       though you had not begun it. */
+    cycleV2: true,
+    setup: S.setup || null,
+    program: S.program,
+    pointer: S.pointer,
+    cycleStart: S.cycleStart,
+    cycleDone: S.cycleDone,
+    restDays: S.restDays || [],
+    restLog: S.restLog || [],
+    restDeleted: S.restDeleted || [],
+    lastCycle: S.lastCycle || null,
+    lastReview: S.lastReview || null,
+    checkins: S.checkins || {},
+    exAliases: S.exAliases || {},
+    stalls: S.stalls || {},
+    deload: S.deload || null,
+    blockStart: S.blockStart || null,
+    planStart: S.planStart || null,
+    wakeTime: S.wakeTime || null,
+    sleepTarget: S.sleepTarget || null,
+    asymRetired: S.asymRetired || {},
+    asymRetest: S.asymRetest || null,
+    volWindow: S.volWindow || "cycle",
+    askWhy: S.askWhy !== false,
+    viewMode: S.viewMode || "regular",
+    experience: S.experience || null,
+    deleted: (S.deleted || []).slice(-500),
+    planLog: (S.planLog || []).slice(-500),
+    sessions: S.sessions,
+    savedAt: S.savedAt
+  }, null, 1);
+}
+
+/* Reading a file back, for the same reason: files now travel in both directions.
+
+   The old version restored seven fields — program, pointer, cycleStart, checkins,
+   restLog, planLog, sessions — and silently dropped rest days, exercise renames,
+   stalls, deloads, the asymmetry state and the cycle's own checkmarks.
+
+   It also adopted any programme it was handed. This version's rotation is fixed, so a
+   file built on a different split has day keys no screen here can draw. The programme
+   is now only taken when its days match; when they don't, the HISTORY still comes in —
+   that is the part worth keeping — and you are told the plan was left alone.          */
+function importJSON(e){
+  var file = e.target.files[0];
+  e.target.value = "";
+  if(!file) return;
+  var r = new FileReader();
+  r.onload = function(){
+    var d;
+    try{ d = JSON.parse(r.result); }
+    catch(err){ toast("That file isn't readable JSON."); return; }
+    if(!d || typeof d !== "object" || (!Array.isArray(d.sessions) && !d.program)){
+      toast("That isn't an Element 26 backup."); return;
+    }
+
+    var incoming = Array.isArray(d.sessions) ? d.sessions.length : 0;
+    var have = S.sessions.length;
+    if(have && !confirm("Replace this device's " + have + " logged workout" + (have===1?"":"s") +
+                        " with the file's " + incoming + "?\n\nThis cannot be undone.")) return;
+
+    var mine = DAYS.slice().concat("finisher");
+    var prog = (d.program && typeof d.program === "object") ? d.program : null;
+    var theirs = prog ? Object.keys(prog).filter(function(k){ return Array.isArray(prog[k]); }) : [];
+    var foreign = theirs.filter(function(k){ return mine.indexOf(k) < 0; });
+    var takeProgram = !!prog && !foreign.length;
+
+    if(prog && !takeProgram &&
+       !confirm("That file's programme is built on a different split (" +
+                foreign.slice(0,4).join(", ") + (foreign.length>4 ? ", …" : "") + ").\n\n" +
+                "This version only runs Push/Pull/Legs A-B, so the plan here is left as it is. " +
+                "The " + incoming + " logged workout" + (incoming===1?"":"s") +
+                " will still be imported.\n\nGo ahead?")) return;
+
+    if(takeProgram){
+      S.program = prog;
+      if(d.pointer != null) S.pointer = d.pointer;
+      if(d.cycleStart) S.cycleStart = d.cycleStart;
+      if(Array.isArray(d.cycleDone)) S.cycleDone = d.cycleDone;
+      if(d.lastCycle) S.lastCycle = d.lastCycle;
+      if(d.deload !== undefined) S.deload = d.deload;
+      if(d.blockStart) S.blockStart = d.blockStart;
+      if(d.planStart) S.planStart = d.planStart;
+    }
+
+    if(Array.isArray(d.sessions)) S.sessions = d.sessions;
+    ["restDays","restLog","restDeleted","deleted","planLog"].forEach(function(k){
+      if(Array.isArray(d[k])) S[k] = d[k];
+    });
+    ["checkins","exAliases","stalls","asymRetired"].forEach(function(k){
+      if(d[k] && typeof d[k] === "object") S[k] = d[k];
+    });
+    ["lastReview","wakeTime","sleepTarget","asymRetest","volWindow","viewMode","experience","setup"]
+      .forEach(function(k){ if(d[k] !== undefined && d[k] !== null) S[k] = d[k]; });
+    if(typeof d.askWhy === "boolean") S.askWhy = d.askWhy;
+
+    /* Renames must be live before anything compares an exercise name, and the plan may
+       have arrived in an older shape, so migrate() runs before the first render. */
+    USER_ALIASES = S.exAliases || {};
+    invalidateTableOrigin();
+    invalidateMultiDay();
+    migrate();
+    recomputeCycle(false);
+    save(); queueSync(); render();
+    toast(takeProgram
+      ? "Imported " + S.sessions.length + " workouts ✓"
+      : "Imported " + S.sessions.length + " workouts, plan left as it was ✓");
+  };
+  r.onerror = function(){ toast("Couldn't read that file."); };
+  r.readAsText(file);
+}
+
 
 </script>
 </body>
