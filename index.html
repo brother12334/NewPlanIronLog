@@ -1407,72 +1407,97 @@ function dayMeta(id){
 function dayName(id){ return dayMeta(id).name; }
 
 /* =====================================================================
-   REST CREDITS
+   REST SLOTS
 
    Six training days across an eight-day cycle, not seven. This programme cut volume
    from 130 sets to 108 because sleep is the binding constraint, and six sessions in
    eight days is a materially easier recovery ask than six in seven.
 
-   The two rests are CREDITS, not slots. They are deliberately NOT pinned into a
-   push-pull-legs-rest-push-pull-legs-rest pattern, and NOT pinned to weekdays, for the
-   same reason weekday-pinning was rejected: fixed placement breaks the moment you miss
-   a session, whereas a credit just gets spent when you need it. Take them back to
-   back, take them three days apart, take neither. The cycle still rolls over on
-   training days completed, exactly as it always has.
+   The two rests are SLOTS, not credits, and you do not choose where they land. They
+   sit at fixed positions in the rotation — push, pull, legs, REST, push, pull, legs,
+   REST — because a rest you spend when you feel like it gets spent on the day you were
+   least inclined to train, which is precisely the day a schedule exists to carry you
+   through. Two credits also went back to back often enough that two-thirds of a
+   cycle's recovery landed in one block and the last three sessions ran on nothing.
+   Fixing the slots is what makes an eight-day cycle an eight-day cycle rather than six
+   sessions and two days off somewhere.
 
-   `S.restDays` holds the dates spent in the CURRENT cycle. `S.restLog` remains the
-   permanent all-time record and is untouched by any of this.                        */
-const REST_CREDITS = 2;
-function restDaysThisCycle(){
-  if(!Array.isArray(S.restDays)) S.restDays = [];
-  return S.restDays;
+   Nothing about a rest day is stored. It is DERIVED: the day after you finish the last
+   training day before a rest slot is a rest day. So it cannot drift out of step with
+   the log, cannot be moved, and needs no reconciliation when two devices sync — the
+   sessions are the only input, and they already merge.
+
+   `S.restLog`, `S.restDays` and `S.restDeleted` are still READ so that rests recorded
+   by hand under the old credit model keep showing up in History. Nothing writes them. */
+
+/* The training day immediately before each rest, read out of CYCLE_LAYOUT rather than
+   named here, so moving a rest in the layout moves the rest day with it. Lazy because
+   CYCLE_LAYOUT is declared further down this file and would still be in its temporal
+   dead zone if this ran at load. */
+let REST_AFTER = null;
+function restAfterDays(){
+  if(REST_AFTER) return REST_AFTER;
+  REST_AFTER = [];
+  CYCLE_LAYOUT.forEach((key, i)=>{
+    if(key !== "rest") return;
+    for(let j=i-1; j>=0; j--){
+      if(CYCLE_LAYOUT[j] !== "rest"){ REST_AFTER.push(CYCLE_LAYOUT[j]); break; }
+    }
+  });
+  return REST_AFTER;
 }
-function restCreditsLeft(){ return Math.max(0, REST_CREDITS - restDaysThisCycle().length); }
-function isRestDay(date){ return restDaysThisCycle().indexOf(date) > -1; }
+function restSlotCount(){ return CYCLE_LAYOUT.filter(k=>k==="rest").length; }
+const dayKey = ms => new Date(ms).toLocaleDateString("en-CA");
+const dayAfter = d => new Date(new Date(d+"T12:00:00").getTime() + DAY_MS).toLocaleDateString("en-CA");
+
+/* Every date the rotation has made a rest day, oldest first. Train Legs A on Monday
+   and Tuesday is a rest day whether or not you opened the app on Tuesday. */
+function restDatesDerived(){
+  const after = restAfterDays();
+  const out = [];
+  S.sessions.forEach(s=>{
+    if(after.indexOf(s.workoutId) < 0) return;
+    const d = dayAfter(dayKey(s.startedAt));
+    if(out.indexOf(d) < 0) out.push(d);
+  });
+  return out.sort();
+}
+/* History keeps showing rests logged by hand before the slots were fixed; a day that
+   was tombstoned back then stays removed. */
+function restDatesAllTime(){
+  const gone = Array.isArray(S.restDeleted) ? S.restDeleted : [];
+  const all = restDatesDerived();
+  (S.restLog || []).forEach(d=>{ if(all.indexOf(d) < 0) all.push(d); });
+  return all.filter(d=>gone.indexOf(d) < 0).sort();
+}
+function restDatesThisCycle(){
+  const from = dayKey(S.cycleStart);
+  return restDatesDerived().filter(d=>d >= from);
+}
+function isRestDay(date){ return restDatesDerived().indexOf(date) > -1; }
 function isRestToday(){ return isRestDay(todayStr()); }
-function takeRestDay(date){
-  const list = restDaysThisCycle();
-  if(list.indexOf(date) > -1) return false;
-  if(list.length >= REST_CREDITS) return false;
-  // logging a day you previously deleted lifts the tombstone, or the next merge would
-  // filter out the day you just took
-  S.restDeleted = restTombstones().filter(d=>d !== date);
-  list.push(date); list.sort();
-  if(!Array.isArray(S.restLog)) S.restLog = [];
-  if(!S.restLog.includes(date)){ S.restLog.push(date); S.restLog.sort(); }
-  return true;
+/* Which of the layout's rests today is, so the strip can light the right plate: the
+   rest that follows the training day you most recently finished. */
+function restSlotToday(){
+  const today = todayStr();
+  const after = restAfterDays();
+  let slot = -1;
+  S.sessions.forEach(s=>{
+    const k = after.indexOf(s.workoutId);
+    if(k < 0) return;
+    if(dayAfter(dayKey(s.startedAt)) === today) slot = k;
+  });
+  return slot;
 }
-/* Giving a credit back. `alsoUnlog` separates "I did not actually rest that day",
-   which should leave no trace, from "free the credit but I did rest", which keeps the
-   day in the permanent log. */
-/* Giving a credit back. `alsoUnlog` separates "I did not actually rest that day",
-   which should leave no trace, from "free the credit but I did rest", which keeps the
-   day in the permanent log.
+/* A rest plate reads one of three ways: it is today, the cycle has already gone past
+   it, or it is still ahead. Past is measured by the training day in front of it being
+   checked off, which is the same test every other plate uses. */
+function restSlotState(idx){
+  if(restSlotToday() === idx) return "today";
+  const ri = ROTATION.indexOf(restAfterDays()[idx]);
+  return (ri > -1 && S.cycleDone.includes(ri)) ? "past" : "ahead";
+}
 
-   A removal has to be RECORDED, not just applied. `S.restLog` and `S.restDays` are
-   merged across devices as unions, so deleting a date locally and then syncing simply
-   re-adopted it from the remote copy and the rest day came back on the next reload.
-   `S.restDeleted` is a tombstone list, exactly like `S.deleted` for sessions: the
-   deletion itself is the thing that syncs, so it survives the merge. */
-function restTombstones(){
-  if(!Array.isArray(S.restDeleted)) S.restDeleted = [];
-  return S.restDeleted;
-}
-function releaseRestDay(date, alsoUnlog){
-  S.restDays = restDaysThisCycle().filter(d=>d !== date);
-  if(alsoUnlog){
-    S.restLog = (S.restLog||[]).filter(d=>d !== date);
-    const t = restTombstones();
-    if(t.indexOf(date) < 0) t.push(date);
-  }
-}
-// short label for a rest plate that has already been spent
-function restPlateLabel(date){
-  if(!date) return "rest";
-  if(date === todayStr()) return "today";
-  const d = new Date(date+"T12:00:00");
-  return d.toLocaleDateString(undefined,{month:"numeric",day:"numeric"});
-}
 /* =====================================================================
    GLOSSARY, every piece of jargon the app uses is tappable.
 
@@ -4381,18 +4406,20 @@ function slotIsPast(i){
 }
 function plateStrip(){
   const cur = S.pointer;
-  const taken = restDaysThisCycle();
   let html = '<div class="plates-wrap"><div class="plates">';
   let restSeen = 0;
   CYCLE_LAYOUT.forEach((key, slot)=>{
     const wd = slotWeekday(slot);
     if(key === "rest"){
+      /* A rest plate is a fixed part of the rotation, not a button. It still takes the
+         tap so it can say so, for the same reason a spent training plate does. */
       const idx = restSeen++;
-      const date = taken[idx] || null;
-      const isToday = date === todayStr();
-      html += `<button class="plate rest${isToday?" cur":""}${date?" done":""}" data-rest="${idx}"
-        aria-label="Rest ${idx+1} of ${REST_CREDITS}, ${wd}${date?", used "+date:", available"}"
-        >R<small>${wd}</small>${date?'<span class="pcheck">&#10003;</span>':""}</button>`;
+      const st = restSlotState(idx);
+      html += `<button class="plate rest${st==="today"?" cur":""}${st==="past"?" done":""}" data-rest="${idx}"
+        aria-disabled="true"
+        aria-label="Rest ${idx+1} of ${restSlotCount()}, ${wd}, ${
+          st==="today" ? "today" : st==="past" ? "already passed" : "still ahead"}"
+        >R<small>${wd}</small>${st==="past"?'<span class="pcheck">&#10003;</span>':""}</button>`;
       return;
     }
     const i = ROTATION.indexOf(key);
@@ -4412,10 +4439,9 @@ function plateStrip(){
       done?'<span class="pcheck">&#10003;</span>':""}</button>`;
   });
   html += "</div>";
-  const left = restCreditsLeft();
+  const restsPast = restDatesThisCycle().length;
   html += `<div class="cycle-row"><span class="num">${S.cycleDone.length} of ${ROTATION.length} done &middot; ${
-    left === REST_CREDITS ? REST_CREDITS+" rests available"
-    : left ? left+" rest left" : "both rests used"}</span><span>${
+    restSlotCount()} rests, fixed${restsPast?" &middot; "+restsPast+" taken":""}</span><span>${
     S.lastReview?'<button id="lastReviewBtn">last review</button> ':''}<button id="cycleReset">reset cycle</button></span></div>`;
   return html + "</div>";
 }
@@ -4713,23 +4739,24 @@ function viewToday(){
     return h + viewActiveSession();
   }
 
+  /* The rest slot is part of the schedule, so it is not offered as a choice and there
+     is no way to train out of it. A workout already in progress is handled above this
+     line, which is deliberate: nobody gets stranded mid-session by the date rolling. */
   if(isRestToday()){
     h += checkinCard();
     h += `<div class="card" style="text-align:center;padding:34px 20px">
       <h3 style="font-size:15px">Rest day</h3>
-      <div class="sub" style="margin-top:8px">Recovery is where the growth happens. Your rotation picks back up tomorrow with <b>${m.name}</b>.</div>
+      <div class="sub" style="margin-top:8px">The rotation puts a rest here, after <b>${
+        dayName(restAfterDays()[Math.max(0, restSlotToday())])}</b>. Recovery is where the growth happens; you pick back up tomorrow with <b>${m.name}</b>.</div>
     </div>`;
-    h += `<div class="btn-row"><button class="btn ghost" id="undoRestBtn">Actually, train today</button></div>`;
     return h;
   }
 
-  // rest days already spent this cycle, noted so they never look "lost"
-  const restsTaken = restDaysThisCycle();
+  // rests this cycle has already been through, noted so they never look "lost"
+  const restsTaken = restDatesThisCycle();
   if(restsTaken.length){
     h += `<div class="rest-note">Rest${restsTaken.length>1?"s":""} this cycle: <b>${
-      restsTaken.map(d=>fmtDate(d)).join("</b>, <b>")}</b> &middot; ${
-      restCreditsLeft() ? restCreditsLeft()+" still available"
-      : `<button id="clearRestBtn" class="linklike">free one up</button>`}</div>`;
+      restsTaken.map(d=>fmtDate(d)).join("</b>, <b>")}</b></div>`;
   }
 
   h += `<div class="card">
@@ -5944,10 +5971,10 @@ function viewHistory(){
     <button class="btn ghost small" id="reportBtn">Print / PDF report</button>
     <button class="btn ghost small" id="docBtn">Download Word doc</button>
   </div>`;
-  const rl = (S.restLog||[]).slice().sort();
+  const rl = restDatesAllTime();
   h += `<div class="card">
     <div class="ex-head" style="margin-bottom:8px"><b style="font-family:var(--disp);font-size:16px;text-transform:uppercase;letter-spacing:.04em">Rest days</b><span class="sub num">${rl.length} total</span></div>
-    <div class="sub" style="margin:-2px 0 10px">Every day you've rested, across all cycles. Add or remove rest days in <b>Settings</b>.</div>
+    <div class="sub" style="margin:-2px 0 10px">Every day you've rested, across all cycles. The rotation places these for you, one after each ${restAfterDays().map(k=>esc(dayName(k))).join(" and ")}.</div>
     ${rl.length ? `<div class="rl-list">${rl.map(d=>`<span class="rl-chip" style="padding:5px 12px">${fmtDate(d)}</span>`).join("")}</div>` : `<div class="sub" style="margin-bottom:2px">None logged yet.</div>`}
   </div>`;
   [...S.sessions].reverse().forEach(s=>{
@@ -6061,7 +6088,7 @@ function viewProgram(){
 /* ---------- SYNC / SETTINGS ---------- */
 function viewSync(){
   const c = S.sync;
-  const restLog = (S.restLog||[]).slice().sort();
+  const restLog = restDatesAllTime();
   let h = `<div class="hdr"><h1>Setup</h1>${hdrRight(`<span class="date num">v${APP_VERSION}</span>`)}</div>
   <div class="card">
     <h3>Who you're logging for</h3>
@@ -6167,7 +6194,7 @@ function viewSync(){
     <div class="sub" style="margin-top:6px;font-size:12.5px">Use <b>Pull</b> when you've just added someone and their history isn't showing, it fetches the gist and reports exactly what came back.</div>
     ${c.lastError?`<div class="rest-note" style="text-align:left;margin:10px 0 0;border-color:var(--bad);color:var(--text)"><b class="danger">Last sync failed</b><br><span class="num" style="font-size:12.5px">${esc(c.lastError)}</span>${/^404/.test(c.lastError)?"<br><br>A 404 here means the gist ID isn't visible to this token, check the ID is the long hex string from the gist URL, and that the token belongs to the account that owns it.":""}${/^401/.test(c.lastError)?"<br><br>A 401 means the token is invalid or expired. Generate a fresh classic token with the <b>gist</b> scope.":""}</div>`:""}
     <div class="sub num" style="margin-top:8px">${c.lastSync?"Last synced "+new Date(c.lastSync).toLocaleString():"Not synced yet"} · ${S.sessions.length} session${S.sessions.length===1?"":"s"} held locally</div>
-    <div class="sub num" style="margin-top:6px;font-size:11px;color:var(--faint)">rests: ${restDaysThisCycle().length?restDaysThisCycle().join(", "):"none"} of ${REST_CREDITS} · cycle since ${new Date(S.cycleStart).toLocaleDateString()} · saved ${new Date(S.savedAt).toLocaleTimeString()}</div>
+    <div class="sub num" style="margin-top:6px;font-size:11px;color:var(--faint)">rests: ${restDatesThisCycle().length?restDatesThisCycle().join(", "):"none"} of ${restSlotCount()} · cycle since ${new Date(S.cycleStart).toLocaleDateString()} · saved ${new Date(S.savedAt).toLocaleTimeString()}</div>
   </div>
   <div class="card">
     <h3>Repo backup</h3>
@@ -6184,12 +6211,11 @@ function viewSync(){
   </div>
   <div class="card">
     <h3>Rest days</h3>
-    <div class="sub" style="margin:4px 0 10px">Log a day you rested, or remove one added by mistake. Rest days show in History and your report.</div>
-    ${restLog.length ? `<div class="rl-list">${restLog.map(d=>`<span class="rl-chip">${fmtDate(d)}<button data-rmrest="${d}" aria-label="Remove">✕</button></span>`).join("")}</div>` : `<div class="sub" style="margin-bottom:8px">None logged yet.</div>`}
-    <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
-      <input type="date" class="timein" id="restDateIn" value="${todayStr()}" style="flex:1;min-height:44px;padding:11px 12px;font-size:15px">
-      <button class="btn small" id="addRestBtn" style="width:auto;padding:11px 20px">Add</button>
-    </div>
+    <div class="sub" style="margin:4px 0 10px">The rotation sets these, so there is nothing to pick. Each rest falls the day after ${
+      restAfterDays().map(k=>"<b>"+esc(dayName(k))+"</b>").join(" and ")}, which is ${
+      restSlotCount()} rests in every ${CYCLE_LAYOUT.length}-day cycle. They show in History and your report.</div>
+    ${restLog.length ? `<div class="rl-list">${restLog.map(d=>`<span class="rl-chip">${fmtDate(d)}</span>`).join("")}</div>`
+                     : `<div class="sub" style="margin-bottom:2px">None yet, the first lands the day after your next ${esc(dayName(restAfterDays()[0]))}.</div>`}
   </div>
   <div class="card">
     <h3>Backup</h3>
@@ -6250,6 +6276,8 @@ function bind(){
       if(S.active){ toast("Finish or discard the current workout first"); return; }
       const slot = parseInt(p.dataset.slot,10);
       if(isNaN(slot)) return;
+      // the rest slots are part of the rotation, so there is nothing to move onto today
+      if(isRestToday()){ toast("Today is a rest day. The rotation picks back up tomorrow"); return; }
       // The rotation is fixed and only runs forwards, so a spent slot is not selectable.
       // See slotIsPast(): re-running a day you've done is how the day at the far end of
       // the cycle stops getting trained.
@@ -6269,53 +6297,19 @@ function bind(){
     if(confirm("Start a fresh cycle? All checkmarks clear (your history is untouched).")){
       S.cycleStart = Date.now();
       S.cycleDone = [];
-      S.restDays = [];
       save(); queueSync(); render();
     }
   };
   const lrev = $("#lastReviewBtn");
   if(lrev) lrev.onclick = ()=> openCycleReview(S.lastReview);
   document.querySelectorAll("[data-rest]").forEach(rp=> rp.onclick = ()=>{
-    if(S.active){ toast("Finish or discard the current workout first"); return; }
-    const slot = parseInt(rp.dataset.rest, 10);
-    const taken = restDaysThisCycle();
-    const date = taken[slot] || null;
-    const today = todayStr();
-    if(date === today){
-      if(confirm("Cancel today's rest day? The credit goes back.")){
-        releaseRestDay(today, true);
-        save(); queueSync(); render();
-      }
-      return;
-    }
-    if(date){ toast("That rest was "+fmtDate(date)+". Tap an empty plate to take another."); return; }
-    if(isRestToday()){ toast("Today is already logged as a rest day"); return; }
-    if(!restCreditsLeft()){ toast("Both rest days are used this cycle"); return; }
-    if(confirm("Take today as a rest day? You get "+REST_CREDITS+" per cycle, and this would be "
-               +(taken.length+1)+" of "+REST_CREDITS+".")){
-      takeRestDay(today);
-      save(); queueSync(); render();
-    }
+    const idx = parseInt(rp.dataset.rest, 10);
+    const st = restSlotState(idx);
+    const after = dayName(restAfterDays()[idx]);
+    toast(st === "today" ? "Today is the rest the rotation gives you after "+after
+        : st === "past"  ? "That rest has already come round this cycle"
+        : "The rotation rests you the day after "+after);
   });
-  const ur = $("#undoRestBtn");
-  if(ur) ur.onclick = ()=>{
-    // decided to train after all, so this was never a rest day: unlog it entirely
-    releaseRestDay(todayStr(), true);
-    save(); queueSync(); render();
-  };
-  const crb = $("#clearRestBtn");
-  if(crb) crb.onclick = ()=>{
-    // frees a credit but keeps the day in the permanent rest log: you did rest that
-    // day, you are only saying it should not count against this cycle's allowance
-    const taken = restDaysThisCycle();
-    if(!taken.length) return;
-    const d = taken[taken.length-1];
-    if(confirm("Free up the rest credit from "+fmtDate(d)+" so you can take another? "
-               +"The day stays in your rest history; remove it in Settings if it was a mistake.")){
-      releaseRestDay(d, false);
-      save(); queueSync(); render();
-    }
-  };
 
   // "See the full breakdown" on the Since-last-time card
   document.querySelectorAll("[data-fullgrade]").forEach(b=> b.onclick=()=>{
@@ -6551,20 +6545,6 @@ function bind(){
   if(rep) rep.onclick = openReport;
   const docB = $("#docBtn");
   if(docB) docB.onclick = downloadDoc;
-
-  const addRest = $("#addRestBtn");
-  if(addRest) addRest.onclick = ()=>{
-    const d = $("#restDateIn").value;
-    if(!d){ toast("Pick a date first"); return; }
-    if(!S.restLog.includes(d)){ S.restLog.push(d); S.restLog.sort(); save(); queueSync(); render(); toast("Rest day logged"); }
-    else toast("That day's already logged");
-  };
-  document.querySelectorAll("[data-rmrest]").forEach(b=> b.onclick=()=>{
-    const d = b.dataset.rmrest;
-    if(!confirm("Remove rest day "+fmtDate(d)+"?")) return;
-    releaseRestDay(d, true);   // tombstoned, so a sync cannot resurrect it
-    save(); queueSync(); render();
-  });
 
   document.querySelectorAll(".sess").forEach(c=>{
     c.onclick = e=>{
@@ -6865,7 +6845,6 @@ function recomputeCycle(announce){
     S.lastCycle = {start:S.cycleStart, end:Date.now()};
     S.cycleStart = Date.now();
     S.cycleDone = [];
-    S.restDays = [];
     /* Back to the top of the rotation. The pointer used to be left wherever the last
        session put it, so the cycle that had just closed on Legs B opened the new one on
        Legs B again — the rotation's own wrap-around was the one place it did not run in
@@ -9193,7 +9172,7 @@ function cycleSummary(start, end){
   let topVolEx = null;
   Object.keys(exVol).forEach(name=>{ if(exVol[name]>0 && (!topVolEx || exVol[name]>topVolEx.vol)) topVolEx = {name, vol:exVol[name]}; });
   // rest days that fall inside this cycle's window
-  const restCount = (S.restLog||[]).filter(d=>{
+  const restCount = restDatesAllTime().filter(d=>{
     const ms = new Date(d+"T12:00:00").getTime();
     return ms>=start && ms<=end;
   }).length;
@@ -9577,21 +9556,15 @@ function mergePlanLog(localArr, remoteArr){
   });
   return [...byKey.values()].sort((a,b)=>a.at-b.at).slice(-500);
 }
-/* A union capped at the allowance, newest kept. A blank must never erase a real rest
-   day, and two devices that each spent one should end up with both rather than with
-   whichever happened to sync last. Tolerates the old single-object shape on the way in
-   so a gist written by v2 still merges. */
+/* Rest days are derived from the sessions now, so there is nothing here to reconcile:
+   the sessions merge, and the rests fall out of them identically on every device. What
+   survives is the union of rests recorded BY HAND under the old credit model, kept so a
+   gist written by an older build does not lose them. No cap, because the allowance it
+   used to enforce no longer exists. Tolerates the old single-object shape on the way
+   in so a gist written by v2 still merges. */
 function pickRestDay(localRD, remoteRD){
   const norm = v => Array.isArray(v) ? v.slice() : (v && v.date) ? [v.date] : [];
-  const all = [...new Set(norm(localRD).concat(norm(remoteRD)))].filter(Boolean).sort();
-  return all.slice(-REST_CREDITS);
-}
-function pruneRestDay(){
-  // after the cycle anchor is settled, drop any rest day that predates this cycle
-  S.restDays = restDaysThisCycle().filter(d=>{
-    const ms = new Date(d+"T12:00:00").getTime();
-    return ms >= S.cycleStart - 24*3600e3;
-  });
+  return [...new Set(norm(localRD).concat(norm(remoteRD)))].filter(Boolean).sort();
 }
 function reconcileCycleAfterMerge(remoteCycleStart){
   // adopt the earliest reasonable anchor so no session belonging to the
@@ -9604,7 +9577,6 @@ function reconcileCycleAfterMerge(remoteCycleStart){
   const valid = candidates.filter(c=>c >= floor);
   S.cycleStart = valid.length ? Math.min(...valid) : inferred;
   recomputeCycle(false);
-  pruneRestDay();
 }
 /* An explicit, loud "go and get their data", the one to reach for when a client's
    history isn't showing. Unlike the silent background sync it reports exactly what the
@@ -10055,7 +10027,7 @@ function buildReportInner(){
 
   let body = `<h1>Training History Report</h1>
   <p class="meta">Prepared ${new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"})} · Element 26</p>
-  <p>This report covers <b>${sessions.length}</b> logged training ${sessions.length===1?"session":"sessions"} from ${longDate(first.date)} through ${longDate(lastS.date)}, comprising ${countLine}.${(S.restLog&&S.restLog.length)?" Rest days taken: "+joinList(S.restLog.slice().sort().map(d=>longDate(d)))+".":""}</p>
+  <p>This report covers <b>${sessions.length}</b> logged training ${sessions.length===1?"session":"sessions"} from ${longDate(first.date)} through ${longDate(lastS.date)}, comprising ${countLine}.${restDatesAllTime().length?" Rest days taken: "+joinList(restDatesAllTime().map(d=>longDate(d)))+".":""}</p>
   ${changes.length?`<p>The programme was edited <b>${changes.length}</b> time${changes.length===1?"":"s"} over this period. Each edit is shown in place, between the sessions it sits between, so a change in the numbers after one of them can be read against it. Edits made before ${longDate(changes[0].date)} were not recorded.</p>`:""}
   <hr>`;
 
@@ -10188,8 +10160,9 @@ function buildCSV(){
   const header = ["Exercise"];
   for(let i=1;i<=maxSets;i++) header.push("Set "+i);
   const rows = [header];
-  if(S.restLog && S.restLog.length){
-    S.restLog.slice().sort().forEach(d=>{
+  const restRows = restDatesAllTime();
+  if(restRows.length){
+    restRows.forEach(d=>{
       rows.push([d+", REST DAY", ...Array(Math.max(0,maxSets)).fill("")]);
     });
     rows.push(Array(maxSets+1).fill(""));
