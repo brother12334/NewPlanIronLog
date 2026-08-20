@@ -456,7 +456,7 @@
      9
     ],
     "rpe": "7-9",
-    "weight": 50,
+    "weight": 40,
     "note": "Pull to hip, shoulder blade travels forward at the bottom · single arm, alternate L/R each set",
     "rest": [
      120,
@@ -472,7 +472,7 @@
      9
     ],
     "rpe": "9",
-    "weight": 50,
+    "weight": 75,
     "note": "Kneeling, full overhead reach, slight lean away · single arm, alternate L/R each set",
     "rest": [
      90,
@@ -489,7 +489,7 @@
      9
     ],
     "rpe": "8-9",
-    "weight": 20,
+    "weight": 95,
     "note": "Bilateral, one D-handle a tower at eye height. Pull toward the ears, rotate knuckles back",
     "rest": [
      90,
@@ -645,14 +645,10 @@
   ],
   "finisher": []
  },
- "pointer": 5,
- "cycleStart": 1785384000000,
+ "pointer": 0,
+ "cycleStart": 1787112000000,
  "cycleDone": [
-  0,
-  1,
-  2,
-  3,
-  4
+  5
  ],
  "restDays": [],
  "restLog": [
@@ -663,125 +659,129 @@
   "2026-07-31"
  ],
  "lastCycle": {
-  "start": 1784779200000,
-  "end": 1785382434328
+  "start": 1785384000000,
+  "end": 1787190469971
  },
  "lastReview": {
   "cur": {
-   "vol": 80888,
-   "n": 7,
+   "vol": 78822,
+   "n": 8,
    "perDay": {
-    "arms": 2,
-    "chest": 2,
     "back": 1,
     "shoulders": 1,
-    "legs": 1
+    "pushA": 1,
+    "pullA": 1,
+    "legsA": 1,
+    "pushB": 1,
+    "pullB": 1,
+    "legsB": 1
    },
    "exTop": {
-    "Incline Dumbbell Curl": 25,
-    "Tricep Pushdown": 110,
-    "Preacher Curl": 25,
-    "Tricep Kickback": 30,
-    "Spider Curl": 20,
-    "Hammer Curl": 25,
-    "Cable Tricep Extension": 90,
-    "Cable Ab Crunch": 160,
-    "Leg Raises": 0,
-    "Dumbbell Bench Press": 45,
-    "Incline Dumbbell Bench Press": 40,
+    "Lat Pulldown": 120,
+    "Chest Supported Row Machine": 140,
+    "Dumbbell RDL": 40,
+    "Cable Lat Prayer": 80,
+    "Cable Ab Crunch": 170,
+    "Leg Raises": 20,
+    "Smith Machine Shoulder Press": 25,
+    "Alternating Cable Lateral Raise": 25,
+    "Cable Reverse Rear Delt Fly": 35,
+    "Smith Flat Bench Press": 40,
+    "Incline Dumbbell Bench Press": 35,
     "Mid Cable Fly (on bench)": 45,
-    "Cable Chest Press (on bench)": 55,
-    "Guillotine Press": 30,
-    "Smith Machine Flat Bench Press": 45,
-    "Lat Pulldown": 110,
-    "Mid Row": 130,
-    "Dumbbell RDL": 35,
-    "Cable Lat Prayer": 70,
-    "Smith Machine Shoulder Press": 20,
-    "Alternating Cable Lateral Raise": 20,
-    "Cable Reverse Rear Delt Fly": 30,
-    "Leg Curl": 135,
-    "Leg Extension": 85,
-    "Hip Thrust": 100,
+    "Dumbbell Lateral Raise": 15,
+    "Overhead Cable Triceps Extension": 90,
+    "Dumbbell Shrug": 50,
+    "Incline Dumbbell Curl": 25,
+    "Single-Arm Cable Hammer Curl": 35,
     "Smith Machine Squat": 17.5,
+    "Dumbbell Bulgarian Split Squat": 10,
+    "Leg Extension": 70,
+    "Seated Leg Curl": 155,
     "Standing Calf Raise (Smith)": 35,
-    "Chest Dips": 0
+    "Incline Smith Machine Bench Press": 35,
+    "Weighted Chest Dips": 0,
+    "Flat Dumbbell Bench Press": 40,
+    "Overhead Cable Extension (V-bar)": 80,
+    "Weighted Pull-Up": 0,
+    "Single-Arm Dumbbell Row": 35,
+    "Single-Arm Cable Pulldown": 70,
+    "Cable Face Pull (two D-handles)": 90,
+    "Preacher Curl": 25,
+    "Bayesian Cable Curl": 40,
+    "Smith Machine Hip Thrust": 25
    },
-   "avgDurMin": 92,
-   "avgFeel": 4,
-   "totalReps": 1466,
-   "totalSets": 120,
+   "avgDurMin": 79,
+   "avgFeel": 3.7,
+   "totalReps": 1359,
+   "totalSets": 125,
    "heaviest": {
     "name": "Cable Ab Crunch",
-    "w": 160,
-    "reps": 15
+    "w": 170,
+    "reps": 7
    },
    "topVolEx": {
     "name": "Cable Ab Crunch",
-    "vol": 17320
+    "vol": 15580
    },
    "restCount": 0
   },
-  "prevVol": 88365,
+  "prevVol": 80888,
   "moved": [
    {
-    "name": "Tricep Pushdown",
-    "from": 100,
-    "to": 110
+    "name": "Lat Pulldown",
+    "from": 110,
+    "to": 120
    },
    {
-    "name": "Cable Tricep Extension",
-    "from": 80,
-    "to": 90
+    "name": "Dumbbell RDL",
+    "from": 35,
+    "to": 40
+   },
+   {
+    "name": "Cable Lat Prayer",
+    "from": 70,
+    "to": 80
    },
    {
     "name": "Cable Ab Crunch",
-    "from": 150,
-    "to": 160
+    "from": 160,
+    "to": 170
    },
    {
-    "name": "Dumbbell Bench Press",
-    "from": 40,
-    "to": 45
+    "name": "Leg Raises",
+    "from": 0,
+    "to": 20
    },
    {
-    "name": "Mid Cable Fly (on bench)",
-    "from": 40,
-    "to": 45
-   },
-   {
-    "name": "Cable Chest Press (on bench)",
-    "from": 50,
-    "to": 55
+    "name": "Smith Machine Shoulder Press",
+    "from": 20,
+    "to": 25
    }
   ],
   "stalled": [
+   {
+    "name": "Mid Cable Fly (on bench)",
+    "w": 45
+   },
    {
     "name": "Incline Dumbbell Curl",
     "w": 25
    },
    {
+    "name": "Smith Machine Squat",
+    "w": 17.5
+   },
+   {
+    "name": "Standing Calf Raise (Smith)",
+    "w": 35
+   },
+   {
     "name": "Preacher Curl",
     "w": 25
-   },
-   {
-    "name": "Tricep Kickback",
-    "w": 30
-   },
-   {
-    "name": "Hammer Curl",
-    "w": 25
-   },
-   {
-    "name": "Incline Dumbbell Bench Press",
-    "w": 40
-   },
-   {
-    "name": "Guillotine Press",
-    "w": 30
    }
   ],
-  "when": 1785382434327
+  "when": 1787190469970
  },
  "checkins": {
   "2026-07-15": {
@@ -845,6 +845,10 @@
   "2026-08-18": {
    "sleep": "8",
    "energy": "7"
+  },
+  "2026-08-19": {
+   "sleep": "7",
+   "energy": "6"
   }
  },
  "exAliases": {},
@@ -1023,6 +1027,18 @@
    "dates": [
     "2026-08-18"
    ]
+  },
+  "dumbbell rdl": {
+   "n": 0,
+   "dates": [
+    "2026-08-19"
+   ]
+  },
+  "smith machine hip thrust": {
+   "n": 0,
+   "dates": [
+    "2026-08-19"
+   ]
   }
  },
  "deload": null,
@@ -1108,6 +1124,39 @@
     "Hard rest ceiling of 4:00, no exceptions"
    ],
    "note": "Sets, reps and RPE targets are unchanged at 108 sets a cycle. Your logged sessions, loads and rest days were left untouched."
+  },
+  {
+   "at": 1787093278203,
+   "date": "2026-08-18",
+   "day": null,
+   "kind": "weight",
+   "name": "Single-Arm Dumbbell Row",
+   "changes": [
+    "50 lb → 40 lb"
+   ],
+   "note": "Double progression: last set cleared the top of the rep range at target RPE."
+  },
+  {
+   "at": 1787093282400,
+   "date": "2026-08-18",
+   "day": null,
+   "kind": "weight",
+   "name": "Single-Arm Cable Pulldown",
+   "changes": [
+    "50 lb → 75 lb"
+   ],
+   "note": "Double progression: last set cleared the top of the rep range at target RPE."
+  },
+  {
+   "at": 1787093286831,
+   "date": "2026-08-18",
+   "day": null,
+   "kind": "weight",
+   "name": "Cable Face Pull (two D-handles)",
+   "changes": [
+    "20 lb → 95 lb"
+   ],
+   "note": "Double progression: last set cleared the top of the rep range at target RPE."
   }
  ],
  "sessions": [
@@ -8854,7 +8903,290 @@
     "when": 1787093246856,
     "v": 2
    }
+  },
+  {
+   "id": "mt0tt5vcm537y",
+   "workoutId": "legsB",
+   "date": "2026-08-19",
+   "startedAt": 1787188367353,
+   "finishedAt": 1787190469956,
+   "entries": [
+    {
+     "name": "Dumbbell RDL",
+     "reps": "8-12",
+     "rpe": "7-9",
+     "note": "50 lb a hand. Hips back, stop when the hamstrings stop lengthening. Straps ok",
+     "rpes": [
+      7,
+      8,
+      8,
+      9
+     ],
+     "warm": "full",
+     "planWeight": 50,
+     "rest": [
+      180,
+      240
+     ],
+     "sets": [
+      {
+       "weight": "40",
+       "reps": "13",
+       "rpe": "7",
+       "done": true,
+       "pr": "WEIGHT PR",
+       "rest": 142
+      },
+      {
+       "weight": "40",
+       "reps": "12",
+       "rpe": "7.5",
+       "done": true,
+       "rest": 210
+      },
+      {
+       "weight": "40",
+       "reps": "12",
+       "rpe": "7.5",
+       "done": true,
+       "rest": 171
+      },
+      {
+       "weight": "40",
+       "reps": "14",
+       "rpe": "9",
+       "done": true,
+       "pr": "REP PR",
+       "rest": 289
+      }
+     ]
+    },
+    {
+     "name": "Smith Machine Hip Thrust",
+     "reps": "8-12",
+     "rpe": "7-9",
+     "note": "Chin tucked, 1-sec squeeze at lockout",
+     "rpes": [
+      7,
+      8,
+      9
+     ],
+     "warm": "light",
+     "planWeight": 115,
+     "rest": [
+      120,
+      180
+     ],
+     "sets": [
+      {
+       "weight": "25",
+       "reps": "11",
+       "rpe": "6.5",
+       "done": true,
+       "rest": 239
+      },
+      {
+       "weight": "25",
+       "reps": "",
+       "rpe": "",
+       "done": false
+      }
+     ]
+    }
+   ],
+   "note": "",
+   "feel": null,
+   "progression": [
+    {
+     "name": "Dumbbell RDL",
+     "kind": "up",
+     "from": 40,
+     "to": 45,
+     "step": {
+      "amount": 5,
+      "unit": "lb a hand",
+      "why": "dumbbell compound"
+     },
+     "msg": "Add weight next time: 40 lb → 45 lb",
+     "sub": "Last set hit 14 reps, the top of 8-12, at RPE 9 against a target of 9. Rebuild from 8 reps at the new load."
+    },
+    {
+     "name": "Smith Machine Hip Thrust",
+     "kind": "hold",
+     "msg": "Need 12 on the last set to move up",
+     "sub": "Last set was 11 reps at 25 lb. 1 more and the load goes up 10 lb."
+    }
+   ],
+   "quality": {
+    "total": 81,
+    "max": 100,
+    "pct": 0.8059999999999999,
+    "grade": "B−",
+    "sections": [
+     {
+      "key": "completion",
+      "label": "Completion",
+      "max": 14,
+      "pts": 3.9,
+      "pct": 0.2777777777777778,
+      "grade": "F",
+      "why": [
+       "5 working sets logged against 18 planned (28%).",
+       "4 exercises from the plan didn't get logged."
+      ],
+      "tip": "Unfinished sets are the cheapest points on this card. If time is the constraint, superset the accessories rather than dropping them.",
+      "ex": null
+     },
+     {
+      "key": "overload",
+      "label": "Progressive overload",
+      "max": 20,
+      "pts": 20,
+      "pct": 1,
+      "grade": "A+",
+      "why": [
+       "1 of 1 lifts went up, 0 held, 0 went down.",
+       "Personal record today: Dumbbell RDL.",
+       "Up: Dumbbell RDL (49→56 est. 1RM)."
+      ],
+      "tip": null,
+      "ex": null
+     },
+     {
+      "key": "intensity",
+      "label": "Effective intensity",
+      "max": 16,
+      "pts": 16,
+      "pct": 1,
+      "grade": "A+",
+      "why": [
+       "5 of 5 sets hit their prescribed RPE target (within 0.5).",
+       "Average RPE 7.5 across 5 scored sets."
+      ],
+      "tip": null,
+      "ex": null
+     },
+     {
+      "key": "rest",
+      "label": "Rest discipline",
+      "max": 12,
+      "pts": 10.1,
+      "pct": 0.8424166666666665,
+      "grade": "B",
+      "why": [
+       "1 of 5 timed rests sat inside the window that set's load called for.",
+       "Set mix: 4 heavy, 1 compound."
+      ],
+      "tip": null,
+      "ex": null
+     },
+     {
+      "key": "reprange",
+      "label": "Rep-range adherence",
+      "max": 10,
+      "pts": 7.8,
+      "pct": 0.78,
+      "grade": "C+",
+      "why": [
+       "3 of 5 sets finished inside their prescribed rep range.",
+       "2 sets went over the top of the range (mostly Dumbbell RDL), so that load has become too light."
+      ],
+      "tip": "Sets finishing above the range are your cue to add weight. Move those up about 5 lb next session.",
+      "ex": "Dumbbell RDL"
+     },
+     {
+      "key": "fatigue",
+      "label": "Fatigue management",
+      "max": 10,
+      "pts": 10,
+      "pct": 1,
+      "grade": "A+",
+      "why": [
+       "Reps fell -8% on average from first set to last at the same load. Up to about 25% is normal.",
+       "Performance held well across sets, so rest and load were matched to the work."
+      ],
+      "tip": null,
+      "ex": null
+     },
+     {
+      "key": "efficiency",
+      "label": "Session efficiency",
+      "max": 8,
+      "pts": 5.3,
+      "pct": 0.66565075,
+      "grade": "D",
+      "why": [
+       "35 minutes for 5 working sets, 5 sets per hour.",
+       "Short session, so there's room for more volume before quality suffers."
+      ],
+      "tip": "Around 5 sets an hour means a lot of standing around. Supersetting unrelated accessories is free time.",
+      "ex": null
+     },
+     {
+      "key": "logquality",
+      "label": "Log quality",
+      "max": 10,
+      "pts": 7.5,
+      "pct": 0.75,
+      "grade": "C",
+      "why": [
+       "Captured: RPE logged on 100% of sets, rest timed on most sets, daily check-in filled in.",
+       "Missing: no feel rating, no session note.",
+       "This is what makes every other section, and your Body map, accurate rather than guesswork."
+      ],
+      "tip": "Each missing field is a place the analysis has to guess. RPE and rest are the two that matter most.",
+      "ex": null
+     }
+    ],
+    "skipped": [],
+    "prs": [
+     {
+      "name": "Dumbbell RDL",
+      "set": 4,
+      "kind": "REP PR",
+      "weight": "40",
+      "reps": "14"
+     }
+    ],
+    "flags": [],
+    "advice": [
+     {
+      "key": "completion",
+      "label": "Completion",
+      "text": "Unfinished sets are the cheapest points on this card. If time is the constraint, superset the accessories rather than dropping them.",
+      "ex": null,
+      "lost": 10.1,
+      "na": false
+     },
+     {
+      "key": "efficiency",
+      "label": "Session efficiency",
+      "text": "Around 5 sets an hour means a lot of standing around. Supersetting unrelated accessories is free time.",
+      "ex": null,
+      "lost": 2.7,
+      "na": false
+     },
+     {
+      "key": "logquality",
+      "label": "Log quality",
+      "text": "Each missing field is a place the analysis has to guess. RPE and rest are the two that matter most.",
+      "ex": null,
+      "lost": 2.5,
+      "na": false
+     },
+     {
+      "key": "reprange",
+      "label": "Rep-range adherence",
+      "text": "Sets finishing above the range are your cue to add weight. Move those up about 5 lb next session.",
+      "ex": "Dumbbell RDL",
+      "lost": 2.2,
+      "na": false
+     }
+    ],
+    "when": 1787190469970,
+    "v": 2
+   }
   }
  ],
- "savedAt": 1787093246857
+ "savedAt": 1787190469972
 }
